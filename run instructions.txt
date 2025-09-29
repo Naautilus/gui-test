@@ -1,0 +1,11 @@
+when at most files are changed:
+[run from /gui-test]
+cmake --build build_release
+cmake --build build_debug
+[or run from directory directly]
+cmake --build .
+
+when (re)creating the /build_[...]/ directory or changing CMakeLists.txt:
+[run from /gui-test]
+cmake -G "MinGW Makefiles" -B build_release -DCMAKE_BUILD_TYPE=Release .
+cmake -G "MinGW Makefiles" -B build_debug -DCMAKE_BUILD_TYPE=Debug .
