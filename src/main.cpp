@@ -7,10 +7,77 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "implot.h"
 #include <GLFW/glfw3.h>
+#include "image/image.h"
+#include <vector>
+#include "data/data_channel.h"
+
+
+class data_over_time {
+    int channels;
+    int timepoints;
+    double duration;
+    std::vector<std::vector<double>> 
+}
+
+const double WINDOW_SIZE_BUFFER = 50;
 
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
+void image_window(std::string name, image& image, ImVec2 pos, ImVec2 size) {
+    ImGui::SetNextWindowPos(pos);
+    ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER, size.y + WINDOW_SIZE_BUFFER));
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground
+                                    | ImGuiWindowFlags_NoBringToFrontOnFocus
+                                    | ImGuiWindowFlags_NoFocusOnAppearing
+                                    | ImGuiWindowFlags_NoResize
+                                    | ImGuiWindowFlags_NoMove
+                                    | ImGuiWindowFlags_NoTitleBar;
+
+    ImGui::Begin(name.c_str(), nullptr, window_flags);
+    ImGui::Image((ImTextureID)(intptr_t)image.texture, size);
+    ImGui::End();
+}
+
+void graph_window(std::string name, std::vector<std::vector<double>> data, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
+
+    ImGui::SetNextWindowPos(pos);
+    ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER, size.y + WINDOW_SIZE_BUFFER));
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground
+                                    | ImGuiWindowFlags_NoBringToFrontOnFocus
+                                    | ImGuiWindowFlags_NoFocusOnAppearing
+                                    | ImGuiWindowFlags_NoResize
+                                    | ImGuiWindowFlags_NoMove
+                                    | ImGuiWindowFlags_NoTitleBar;
+
+    ImGui::Begin(name.c_str(), nullptr, window_flags);
+
+    {
+        static ImPlotColormap map = ImPlotColormap_Hot;
+        ImPlot::PushColormap(map);
+
+        static ImPlotAxisFlags axis_flags = ImPlotAxisFlags_Lock 
+                                        | ImPlotAxisFlags_NoGridLines 
+                                        | ImPlotAxisFlags_NoTickMarks 
+                                        | ImPlotAxisFlags_NoTickLabels
+                                        | ImPlotAxisFlags_NoDecorations
+                                        | ImPlotAxisFlags_NoLabel;
+
+        if (ImPlot::BeginPlot("##Heatmap1", ImVec2(size.x, size.y))) {
+            ImPlot::SetupAxes(nullptr, nullptr, axis_flags, axis_flags);
+            ImPlot::PlotHeatmap("Temperature", &data[0], data.size(), data.size, min, max, nullptr, ImPlotPoint(0,0), ImPlotPoint(1,1));
+            ImPlot::EndPlot();
+        }
+        ImGui::SameLine();
+        ImPlot::ColormapScale("##ColormapScale", min, max, ImVec2(x_size * 0.05, y_size*0.175));
+        ImPlot::PopColormap();
+    }
+
+    ImGui::End();
 }
 
 // Main code
@@ -71,6 +138,8 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    image rocket("../images/rocket.png");
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -129,50 +198,9 @@ int main(int, char**)
         }
 
         {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::SetNextWindowPos(ImVec2(x_size * 0.3, y_size * 0.5));
-            ImGui::SetNextWindowSize(ImVec2(x_size * 0.3, y_size * 0.2));
-
-            ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground
-                                          | ImGuiWindowFlags_NoBringToFrontOnFocus
-                                          | ImGuiWindowFlags_NoFocusOnAppearing
-                                          | ImGuiWindowFlags_NoResize
-                                          | ImGuiWindowFlags_NoMove
-                                          | ImGuiWindowFlags_NoTitleBar;
-
-            ImGui::Begin("window", nullptr, window_flags);
-
-            {
-                static ImPlotColormap map = ImPlotColormap_Hot;
-                ImPlot::PushColormap(map);
-
-                static ImPlotAxisFlags axis_flags = ImPlotAxisFlags_Lock 
-                                                | ImPlotAxisFlags_NoGridLines 
-                                                | ImPlotAxisFlags_NoTickMarks 
-                                                | ImPlotAxisFlags_NoTickLabels
-                                                | ImPlotAxisFlags_NoDecorations
-                                                | ImPlotAxisFlags_NoLabel;
-
-                double min = 0;
-                double max = 100;
-                if (ImPlot::BeginPlot("##Heatmap1", ImVec2(x_size * 0.225, y_size*0.175))) {
-                    double data[100];
-                    for (int i = 0; i < 100; i++) {
-                        data[i] = i;
-                    }
-                    ImPlot::SetupAxes(nullptr, nullptr, axis_flags, axis_flags);
-                    ImPlot::PlotHeatmap("", &data[0], 10, 10, min, max, "", ImPlotPoint(0,0), ImPlotPoint(1,1));
-                    ImPlot::EndPlot();
-                }
-                ImGui::SameLine();
-                ImPlot::ColormapScale("##HeatScale", min, max, ImVec2(x_size * 0.05, y_size*0.175));
-                ImPlot::PopColormap();
-            }
-
-            ImGui::End();
         }
+
+        image_window("rocket window", rocket, ImVec2(x_size * 0.3, y_size * 0.3), ImVec2(x_size * 0.1, y_size * 0.3));
 
         // Rendering
         ImGui::Render();
