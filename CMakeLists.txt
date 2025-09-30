@@ -27,12 +27,25 @@ target_include_directories(imgui PRIVATE
     external/imgui/backends
 )
 
+add_library(implot
+    external/implot/implot.cpp
+    external/implot/implot_items.cpp
+    external/implot/implot.h
+    external/implot/implot_internal.h
+)
+
+target_include_directories(implot PRIVATE
+    external/implot
+    external/imgui
+)
+
 # Create the executable
 add_executable(main ${SRC_FILES})
-target_link_libraries(main PRIVATE imgui glfw3 opengl32 m)
+target_link_libraries(main PRIVATE imgui glfw3 opengl32 m implot)
 
 # Include ImGui headers
 target_include_directories(main PRIVATE
     external/imgui
     external/imgui/backends
+    external/implot
 )

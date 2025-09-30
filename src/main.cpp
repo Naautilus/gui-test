@@ -5,18 +5,8 @@
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
-
-// https://gist.github.com/ConnerWill/d4b6c776b509add763e17f9f113fd25b
-
-void wait(double millis) {
-    auto start = std::chrono::high_resolution_clock::now();
-    while (std::chrono::high_resolution_clock::now() - start < std::chrono::milliseconds(1000)) {};
-}
-
-// [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
-// To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
-// Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
+#include "implot.h"
+#include <GLFW/glfw3.h>
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -26,6 +16,7 @@ static void glfw_error_callback(int error, const char* description)
 // Main code
 int main(int, char**)
 {
+
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
@@ -36,7 +27,19 @@ int main(int, char**)
 
     // Create window with graphics context
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
-    GLFWwindow* window = glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale), "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "Dear ImGui GLFW+OpenGL3 example", glfwGetPrimaryMonitor(), nullptr);
+
+    int x_size;
+    int y_size;
+    glfwGetWindowSize(window, &x_size, &y_size);
+
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
@@ -45,6 +48,7 @@ int main(int, char**)
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -61,23 +65,6 @@ int main(int, char**)
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details. If you like the default font but want it to scale better, consider using the 'ProggyVector' from the same author!
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    // - Our Emscripten build process allows embedding fonts to be accessible at runtime from the "fonts/" folder. See Makefile.emscripten for details.
-    //style.FontSizeBase = 20.0f;
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf");
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf");
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf");
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf");
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf");
-    //IM_ASSERT(font != nullptr);
 
     // Our state
     bool show_demo_window = true;
@@ -141,6 +128,52 @@ int main(int, char**)
             ImGui::End();
         }
 
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+
+            ImGui::SetNextWindowPos(ImVec2(x_size * 0.3, y_size * 0.5));
+            ImGui::SetNextWindowSize(ImVec2(x_size * 0.3, y_size * 0.2));
+
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground
+                                          | ImGuiWindowFlags_NoBringToFrontOnFocus
+                                          | ImGuiWindowFlags_NoFocusOnAppearing
+                                          | ImGuiWindowFlags_NoResize
+                                          | ImGuiWindowFlags_NoMove
+                                          | ImGuiWindowFlags_NoTitleBar;
+
+            ImGui::Begin("window", nullptr, window_flags);
+
+            {
+                static ImPlotColormap map = ImPlotColormap_Hot;
+                ImPlot::PushColormap(map);
+
+                static ImPlotAxisFlags axis_flags = ImPlotAxisFlags_Lock 
+                                                | ImPlotAxisFlags_NoGridLines 
+                                                | ImPlotAxisFlags_NoTickMarks 
+                                                | ImPlotAxisFlags_NoTickLabels
+                                                | ImPlotAxisFlags_NoDecorations
+                                                | ImPlotAxisFlags_NoLabel;
+
+                double min = 0;
+                double max = 100;
+                if (ImPlot::BeginPlot("##Heatmap1", ImVec2(x_size * 0.225, y_size*0.175))) {
+                    double data[100];
+                    for (int i = 0; i < 100; i++) {
+                        data[i] = i;
+                    }
+                    ImPlot::SetupAxes(nullptr, nullptr, axis_flags, axis_flags);
+                    ImPlot::PlotHeatmap("", &data[0], 10, 10, min, max, "", ImPlotPoint(0,0), ImPlotPoint(1,1));
+                    ImPlot::EndPlot();
+                }
+                ImGui::SameLine();
+                ImPlot::ColormapScale("##HeatScale", min, max, ImVec2(x_size * 0.05, y_size*0.175));
+                ImPlot::PopColormap();
+            }
+
+            ImGui::End();
+        }
+
         // Rendering
         ImGui::Render();
         int display_w, display_h;
@@ -156,10 +189,9 @@ int main(int, char**)
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();
-
-    return 0;
 }
