@@ -53,8 +53,7 @@ void graph_window(std::string name, data_history data_history_, double min, doub
     ImGui::Begin(name.c_str(), nullptr, window_flags);
 
     {
-        static ImPlotColormap map = ImPlotColormap_Hot;
-        ImPlot::PushColormap(map);
+        ImPlot::PushColormap(colormap);
 
         static ImPlotAxisFlags axis_flags = ImPlotAxisFlags_Lock 
                                         | ImPlotAxisFlags_NoGridLines 
@@ -68,7 +67,7 @@ void graph_window(std::string name, data_history data_history_, double min, doub
             std::vector<double> data_array = data_history_.get_1d_vector();
             std::cout << "length: " << data_history_.get_length() << "\n";
             std::cout << "width: " << data_history_.get_width() << "\n";
-            ImPlot::PlotHeatmap("Temperature", &data_array[0], data_history_.get_width(), data_history_.get_length(), min, max, nullptr, ImPlotPoint(0,0), ImPlotPoint(1,1));
+            ImPlot::PlotHeatmap(name.c_str(), &data_array[0], data_history_.get_width(), data_history_.get_length(), min, max, nullptr, ImPlotPoint(0,0), ImPlotPoint(1,1));
             ImPlot::EndPlot();
         }
         ImGui::SameLine();
@@ -136,7 +135,9 @@ int main()
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     image rocket("../images/rocket.png");
-    data_history rocket_data_history(1000, 8);
+    data_history history_temperature(1000, 8);
+    data_history history_pressure(1000, 5);
+    data_history history_thrust(1000, 1);
     int tick = 0;
 
     // Main loop
@@ -197,18 +198,33 @@ int main()
         }
 
         {
-            int width = rocket_data_history.get_width();
-            data_channel rocket_current_data(width);
+            int width = history_temperature.get_width();
+            data_channel rocket_current_data(history_temperature.get_width());
             std::vector<double> data;
-            for (int i = 0; i < width; i++) {
-                data.push_back(sin(0.01 * i * tick));
-                //data.push_back(i * 1.0 / width);
-            }
-            std::cout << ":) [" << tick << "]\n";
+            for (int i = 0; i < width; i++) data.push_back(sin(0.01 * (i+1) * tick));
             rocket_current_data.set_data(data);
-            rocket_data_history.update_data(rocket_current_data);
-            graph_window("graph window", rocket_data_history, -1, 1, ImPlotColormap_Hot, ImVec2(x_size * 0.5, y_size * 0.5), ImVec2(x_size * 0.4, y_size * 0.3));
-            tick++;
+            history_temperature.update_data(rocket_current_data);
+            graph_window("Temperature (*C)", history_temperature, -1, 1, ImPlotColormap_Hot, ImVec2(x_size * 0.5, y_size * 0.5), ImVec2(x_size * 0.4, y_size * 0.3));
+        }
+
+        {
+            int width = history_pressure.get_width();
+            data_channel rocket_current_data(history_pressure.get_width());
+            std::vector<double> data;
+            for (int i = 0; i < width; i++) data.push_back(sin(0.01 * (i+1) * tick));
+            rocket_current_data.set_data(data);
+            history_pressure.update_data(rocket_current_data);
+            graph_window("Pressure (MPa)", history_pressure, -1, 1, ImPlotColormap_Viridis, ImVec2(x_size * 0.5, y_size * 0.35), ImVec2(x_size * 0.4, y_size * 0.15));
+        }
+
+        {
+            int width = history_thrust.get_width();
+            data_channel rocket_current_data(history_thrust.get_width());
+            std::vector<double> data;
+            for (int i = 0; i < width; i++) data.push_back(sin(0.01 * (i+1) * tick));
+            rocket_current_data.set_data(data);
+            history_thrust.update_data(rocket_current_data);
+            graph_window("Thrust (kN)", history_thrust, -1, 1, ImPlotColormap_BrBG, ImVec2(x_size * 0.5, y_size * 0.8), ImVec2(x_size * 0.4, y_size * 0.1));
         }
 
         image_window("rocket window", rocket, ImVec2(x_size * 0.3, y_size * 0.3), ImVec2(x_size * 0.1, y_size * 0.3));
@@ -223,6 +239,7 @@ int main()
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
+        tick++;
     }
 
     // Cleanup
