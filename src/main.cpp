@@ -10,16 +10,12 @@
 #include "image/image.h"
 #include <vector>
 #include "data/data_channel.h"
-
-
-class data_over_time {
-    int channels;
-    int timepoints;
-    double duration;
-    std::vector<std::vector<double>> 
-}
+#include "data/data_history.h"
+#include "math.h"
 
 const double WINDOW_SIZE_BUFFER = 50;
+int x_size;
+int y_size;
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -42,7 +38,7 @@ void image_window(std::string name, image& image, ImVec2 pos, ImVec2 size) {
     ImGui::End();
 }
 
-void graph_window(std::string name, std::vector<std::vector<double>> data, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
+void graph_window(std::string name, data_history data_history_, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
 
     ImGui::SetNextWindowPos(pos);
     ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER, size.y + WINDOW_SIZE_BUFFER));
@@ -67,13 +63,16 @@ void graph_window(std::string name, std::vector<std::vector<double>> data, doubl
                                         | ImPlotAxisFlags_NoDecorations
                                         | ImPlotAxisFlags_NoLabel;
 
-        if (ImPlot::BeginPlot("##Heatmap1", ImVec2(size.x, size.y))) {
+        if (ImPlot::BeginPlot("##Heatmap1", ImVec2(size.x - x_size * 0.05, size.y))) {
             ImPlot::SetupAxes(nullptr, nullptr, axis_flags, axis_flags);
-            ImPlot::PlotHeatmap("Temperature", &data[0], data.size(), data.size, min, max, nullptr, ImPlotPoint(0,0), ImPlotPoint(1,1));
+            std::vector<double> data_array = data_history_.get_1d_vector();
+            std::cout << "length: " << data_history_.get_length() << "\n";
+            std::cout << "width: " << data_history_.get_width() << "\n";
+            ImPlot::PlotHeatmap("Temperature", &data_array[0], data_history_.get_width(), data_history_.get_length(), min, max, nullptr, ImPlotPoint(0,0), ImPlotPoint(1,1));
             ImPlot::EndPlot();
         }
         ImGui::SameLine();
-        ImPlot::ColormapScale("##ColormapScale", min, max, ImVec2(x_size * 0.05, y_size*0.175));
+        ImPlot::ColormapScale("##ColormapScale", min, max, ImVec2(x_size * 0.05, size.y));
         ImPlot::PopColormap();
     }
 
@@ -81,7 +80,7 @@ void graph_window(std::string name, std::vector<std::vector<double>> data, doubl
 }
 
 // Main code
-int main(int, char**)
+int main()
 {
 
     glfwSetErrorCallback(glfw_error_callback);
@@ -103,8 +102,6 @@ int main(int, char**)
 
     GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "Dear ImGui GLFW+OpenGL3 example", glfwGetPrimaryMonitor(), nullptr);
 
-    int x_size;
-    int y_size;
     glfwGetWindowSize(window, &x_size, &y_size);
 
     if (window == nullptr)
@@ -139,6 +136,8 @@ int main(int, char**)
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     image rocket("../images/rocket.png");
+    data_history rocket_data_history(1000, 8);
+    int tick = 0;
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -198,6 +197,18 @@ int main(int, char**)
         }
 
         {
+            int width = rocket_data_history.get_width();
+            data_channel rocket_current_data(width);
+            std::vector<double> data;
+            for (int i = 0; i < width; i++) {
+                data.push_back(sin(0.01 * i * tick));
+                //data.push_back(i * 1.0 / width);
+            }
+            std::cout << ":) [" << tick << "]\n";
+            rocket_current_data.set_data(data);
+            rocket_data_history.update_data(rocket_current_data);
+            graph_window("graph window", rocket_data_history, -1, 1, ImPlotColormap_Hot, ImVec2(x_size * 0.5, y_size * 0.5), ImVec2(x_size * 0.4, y_size * 0.3));
+            tick++;
         }
 
         image_window("rocket window", rocket, ImVec2(x_size * 0.3, y_size * 0.3), ImVec2(x_size * 0.1, y_size * 0.3));
