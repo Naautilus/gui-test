@@ -18,13 +18,6 @@ const double WINDOW_SIZE_BUFFER = 50;
 int x_size;
 int y_size;
 
-void initialize_glfw() {
-    if (!glfwInit()) {
-        std::cerr << "GLFW failed to initialize\n";
-        std::abort();
-    }
-}
-
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -47,7 +40,7 @@ void image_window(std::string name, image& image, ImVec2 pos, ImVec2 size) {
 }
 
 void graph_window(std::string name, data_history data_history_, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
-
+    std::lock_guard<std::mutex> lock(history_mutex);    
     ImGui::SetNextWindowPos(pos);
     ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER, size.y + WINDOW_SIZE_BUFFER));
 
@@ -88,7 +81,10 @@ void start_renderer()
 {
 
     glfwSetErrorCallback(glfw_error_callback);
-    if (glfw_is_initialized) initialize_glfw();
+    if (!glfwInit()) {
+        std::cerr << "GLFW failed to initialize\n";
+        std::abort();
+    }
     
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -111,6 +107,8 @@ void start_renderer()
         std::abort();
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
+
+    initialize_images();
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -216,7 +214,6 @@ void start_renderer()
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-        tick++;
     }
 
     // Cleanup

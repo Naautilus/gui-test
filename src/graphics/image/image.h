@@ -5,5 +5,6 @@
 struct image {
     int width, height = 0;
     GLuint texture = 0;
+    image();
     image(std::string path);
 };

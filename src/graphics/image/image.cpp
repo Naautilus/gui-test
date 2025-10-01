@@ -7,7 +7,9 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "../../globals.h"
 #include "../renderer.h"
+#include <iostream>
 
+// EXTERNAL CODE
 // Simple helper function to load an image into a OpenGL texture with common settings
 bool LoadTextureFromMemory(const void* data, size_t data_size, GLuint* out_texture, int* out_width, int* out_height)
 {
@@ -39,6 +41,7 @@ bool LoadTextureFromMemory(const void* data, size_t data_size, GLuint* out_textu
     return true;
 }
 
+// EXTERNAL CODE
 // Open and read a file, then forward to LoadTextureFromMemory()
 bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int* out_width, int* out_height)
 {
@@ -58,8 +61,12 @@ bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int* out_wi
     return ret;
 }
 
+image::image() {}
+
 image::image(std::string path) {
-    if (!glfw_is_initialized) initialize_glfw();
     bool ret = LoadTextureFromFile(path.c_str(), &texture, &width, &height);
-    IM_ASSERT(ret);
+    if (!ret) {
+        std::cerr << "image \"" << path << "\" failed to load; aborting\n";
+        std::abort();
+    }
 }
