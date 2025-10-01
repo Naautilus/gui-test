@@ -5,6 +5,8 @@
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "../../globals.h"
+#include "../renderer.h"
 
 // Simple helper function to load an image into a OpenGL texture with common settings
 bool LoadTextureFromMemory(const void* data, size_t data_size, GLuint* out_texture, int* out_width, int* out_height)
@@ -57,6 +59,7 @@ bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int* out_wi
 }
 
 image::image(std::string path) {
+    if (!glfw_is_initialized) initialize_glfw();
     bool ret = LoadTextureFromFile(path.c_str(), &texture, &width, &height);
     IM_ASSERT(ret);
 }

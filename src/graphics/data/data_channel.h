@@ -7,6 +7,7 @@ class data_channel {
     public:
     void verify_data();
     data_channel(int width_);
+    data_channel(std::vector<double> data);
     void set_data(std::vector<double> new_data);
     std::vector<double> get_data();
 };

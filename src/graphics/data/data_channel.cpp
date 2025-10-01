@@ -16,11 +16,19 @@
     }
     data_channel::data_channel(int width_) {
         if (width_ < 1) {
-            std::cerr << "bad data_channel creation: width = " << width_ << "\n";
+            std::cerr << "bad data_channel creation: width_ = " << width_ << "\n";
             std::abort();
         }
         width = width_;
         data = std::vector<double>(width, std::numeric_limits<double>::lowest());
+    }
+    data_channel::data_channel(std::vector<double> data_) {
+        if (data_.size() < 1) {
+            std::cerr << "bad data_channel creation: data_.size() = " << data_.size() << "\n";
+            std::abort();
+        }
+        width = data_.size();
+        set_data(data_);
     }
     void data_channel::set_data(std::vector<double> new_data) {
         data = new_data;
