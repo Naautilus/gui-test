@@ -205,7 +205,7 @@ void start_renderer()
             ImGui::End();
         }
 
-        image_window("rocket window", rocket, ImVec2(x_size * 0.4, y_size * 0.5), ImVec2(x_size * 0.1, y_size * 0.3));
+        image_window("rocket window", rocket, ImVec2(x_size * 0.45, y_size * 0.45), ImVec2(x_size * 0.1, y_size * 0.3));
 
         graph_window("Pressure (MPa)", history_pressure, 0, 1000, ImPlotColormap_Viridis, ImVec2(x_size * 0.55, y_size * 0.3), ImVec2(x_size * 0.4, y_size * 0.15));
         graph_window("Temperature (*C)", history_temperature, 0, 500, ImPlotColormap_Hot, ImVec2(x_size * 0.55, y_size * 0.45), ImVec2(x_size * 0.4, y_size * 0.3));
