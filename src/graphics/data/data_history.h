@@ -13,6 +13,7 @@ class data_history {
     void update_data(data_channel<double> new_data);
     data_channel<double> get_current_data();
     std::vector<data_channel<double>> get_data_history();
+    data_channel<std::string> get_labels();
     std::vector<double> get_1d_vector();
     int get_length();
     int get_width();

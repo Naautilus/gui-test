@@ -50,6 +50,10 @@ std::vector<data_channel<double>> data_history::get_data_history() {
     return history;
 }
 
+data_channel<std::string> data_history::get_labels() {
+    return labels;
+}
+
 std::vector<double> data_history::get_1d_vector() {
     std::vector<double> output(length * width, std::numeric_limits<double>::lowest());
     for (int i = 0; i < length; i++) {

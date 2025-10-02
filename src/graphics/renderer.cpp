@@ -14,7 +14,9 @@
 #include "data/data_history.h"
 #include "../globals.h"
 
-const double WINDOW_SIZE_BUFFER = 50;
+const double WINDOW_SIZE_BUFFER = 25;
+const double GRAPH_BORDER_WIDTH = 5;
+double content_scale;
 int x_size;
 int y_size;
 
@@ -25,7 +27,7 @@ static void glfw_error_callback(int error, const char* description)
 
 void image_window(std::string name, image& image, ImVec2 pos, ImVec2 size) {
     ImGui::SetNextWindowPos(pos);
-    ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER, size.y + WINDOW_SIZE_BUFFER));
+    ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER * content_scale, size.y + WINDOW_SIZE_BUFFER * content_scale));
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground
                                     | ImGuiWindowFlags_NoBringToFrontOnFocus
@@ -42,14 +44,14 @@ void image_window(std::string name, image& image, ImVec2 pos, ImVec2 size) {
 void graph_window(std::string name, data_history data_history_, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
     std::lock_guard<std::mutex> lock(history_mutex);    
     ImGui::SetNextWindowPos(pos);
-    ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER, size.y + WINDOW_SIZE_BUFFER));
+    ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER * content_scale, size.y + WINDOW_SIZE_BUFFER * content_scale));
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground
-                                    | ImGuiWindowFlags_NoBringToFrontOnFocus
                                     | ImGuiWindowFlags_NoFocusOnAppearing
                                     | ImGuiWindowFlags_NoResize
                                     | ImGuiWindowFlags_NoMove
-                                    | ImGuiWindowFlags_NoTitleBar;
+                                    | ImGuiWindowFlags_NoTitleBar
+                                    | ImGuiWindowFlags_NoInputs;
 
     ImGui::Begin(name.c_str(), nullptr, window_flags);
 
@@ -74,6 +76,29 @@ void graph_window(std::string name, data_history data_history_, double min, doub
         ImPlot::PopColormap();
     }
 
+    std::vector<ImVec2> label_positions;
+
+    double graph_start_y = pos.y + 2 * GRAPH_BORDER_WIDTH * content_scale;
+    double graph_end_y = pos.y + size.y;
+    double graph_side_x = pos.x + size.x - x_size * 0.05;
+
+    std::vector<std::string> labels = data_history_.get_labels().get_data();
+    for (int i = 0; i < labels.size(); i++) {
+        std::string label = labels[i];
+        double x = graph_side_x - ImGui::CalcTextSize(label.c_str()).x;
+        double y = graph_start_y + (i * 1.0 / labels.size()) * (graph_end_y - graph_start_y);
+        y += 0.5 * (graph_end_y - graph_start_y) / labels.size() - 0.5 * ImGui::CalcTextSize(label.c_str()).y;
+        std::string label_window_name = name;
+        label_window_name += "_";
+        label_window_name += i;
+
+        ImGui::SetCursorPos(ImVec2(x - pos.x + content_scale, y - pos.y + content_scale));
+        ImGui::TextColored(ImVec4(0.0, 0.0, 0.0, 1.0), label.c_str());
+        
+        ImGui::SetCursorPos(ImVec2(x - pos.x, y - pos.y));
+        ImGui::Text(label.c_str());
+    }
+
     ImGui::End();
 }
 
@@ -91,7 +116,7 @@ void start_renderer()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     // Create window with graphics context
-    float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
+    content_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
 
     const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     glfwWindowHint(GLFW_RED_BITS, mode->redBits);
@@ -124,8 +149,8 @@ void start_renderer()
 
     // Setup scaling
     ImGuiStyle& style = ImGui::GetStyle();
-    style.ScaleAllSizes(main_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
-    style.FontScaleDpi = main_scale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
+    style.ScaleAllSizes(content_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
+    style.FontScaleDpi = content_scale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
