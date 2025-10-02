@@ -91,35 +91,12 @@ int main() {
 
         {
             std::lock_guard<std::mutex> lock(history_mutex);
-            int width = history_pressure.get_width();
-            data_channel rocket_current_data(history_pressure.get_width());
-            rocket_current_data.set_data(simulated_pressure);
-            history_pressure.update_data(rocket_current_data);
+            history_pressure.update_data(data_channel(simulated_pressure));
+            history_temperature.update_data(data_channel(simulated_temperature));
+            history_thrust.update_data(data_channel(simulated_thrust));
+            history_vibration.update_data(data_channel(simulated_vibration));
         }
 
-        {
-            std::lock_guard<std::mutex> lock(history_mutex);
-            int width = history_temperature.get_width();
-            data_channel rocket_current_data(history_temperature.get_width());
-            rocket_current_data.set_data(simulated_temperature);
-            history_temperature.update_data(rocket_current_data);
-        }
-    
-        {
-            std::lock_guard<std::mutex> lock(history_mutex);
-            int width = history_thrust.get_width();
-            data_channel rocket_current_data(history_thrust.get_width());
-            rocket_current_data.set_data(simulated_thrust);
-            history_thrust.update_data(rocket_current_data);
-        }
-    
-        {
-            std::lock_guard<std::mutex> lock(history_mutex);
-            int width = history_vibration.get_width();
-            data_channel rocket_current_data(history_vibration.get_width());
-            rocket_current_data.set_data(simulated_vibration);
-            history_vibration.update_data(rocket_current_data);
-        }
         while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
         tick++;
     }
