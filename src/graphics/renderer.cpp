@@ -134,10 +134,19 @@ void start_renderer()
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.12f, 0.12f, 0.14f, 1.00f);
 
-    std::vector<ImU32> colors = {ImColor(0, 30, 0), ImColor(0, 255, 0)};
-    ImPlotColormap colormap_green = ImPlot::AddColormap("green", &colors[0], 2, false);
+    ImPlotColormap colormap_green;
+    ImPlotColormap colormap_pink;
+    {
+        std::vector<ImU32> colors = {ImColor(0, 30, 0), ImColor(0, 255, 0), ImColor(200, 255, 200)};
+        colormap_green = ImPlot::AddColormap("green", &colors[0], colors.size(), false);
+    }
+
+    {
+        std::vector<ImU32> colors = {ImColor(30, 0, 30), ImColor(255, 0, 255), ImColor(255, 200, 255)};
+        colormap_pink = ImPlot::AddColormap("pink", &colors[0], colors.size(), false);
+    }
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -198,10 +207,10 @@ void start_renderer()
 
         image_window("rocket window", rocket, ImVec2(x_size * 0.4, y_size * 0.5), ImVec2(x_size * 0.1, y_size * 0.3));
 
-        graph_window("Pressure (MPa)", history_pressure, -1, 1, ImPlotColormap_Viridis, ImVec2(x_size * 0.5, y_size * 0.35), ImVec2(x_size * 0.4, y_size * 0.15));
-        graph_window("Temperature (*C)", history_temperature, -1, 1, ImPlotColormap_Hot, ImVec2(x_size * 0.5, y_size * 0.5), ImVec2(x_size * 0.4, y_size * 0.3));
-        graph_window("Thrust (kN)", history_thrust, -1, 1, colormap_green, ImVec2(x_size * 0.5, y_size * 0.8), ImVec2(x_size * 0.4, y_size * 0.1));
-        graph_window("Vibration (m/s^2)", history_vibration, -1, 1, ImPlotColormap_Pink, ImVec2(x_size * 0.5, y_size * 0.9), ImVec2(x_size * 0.4, y_size * 0.04));
+        graph_window("Pressure (MPa)", history_pressure, 0, 1000, ImPlotColormap_Viridis, ImVec2(x_size * 0.55, y_size * 0.3), ImVec2(x_size * 0.4, y_size * 0.15));
+        graph_window("Temperature (*C)", history_temperature, 0, 500, ImPlotColormap_Hot, ImVec2(x_size * 0.55, y_size * 0.45), ImVec2(x_size * 0.4, y_size * 0.3));
+        graph_window("Thrust (kN)", history_thrust, 0, 10, colormap_green, ImVec2(x_size * 0.55, y_size * 0.75), ImVec2(x_size * 0.4, y_size * 0.1));
+        graph_window("Vibration (m/s^2)", history_vibration, 0, 100, colormap_pink, ImVec2(x_size * 0.55, y_size * 0.85), ImVec2(x_size * 0.4, y_size * 0.1));
 
         
         // Rendering
