@@ -4,6 +4,7 @@
 #include <mutex>
 
 extern image rocket;
+extern std::vector<std::pair<float, float>> valve_timings;
 extern data_history history_temperature;
 extern data_history history_pressure;
 extern data_history history_thrust;

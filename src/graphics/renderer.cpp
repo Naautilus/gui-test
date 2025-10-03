@@ -193,10 +193,11 @@ void start_renderer()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
-
+        /*
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
             static float f = 0.0f;
@@ -229,13 +230,54 @@ void start_renderer()
                 show_another_window = false;
             ImGui::End();
         }
+        */
+
+        {
+            ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.005));
+            ImGui::SetNextWindowSize(ImVec2(x_size * 0.29, y_size * 0.29));
+            ImGui::Begin("Control", nullptr);
+            std::string fire_text;
+            fire_text += "                      \n";
+            fire_text += "      ----------      \n";
+            fire_text += "      |  FIRE  |      \n";
+            fire_text += "      ----------      \n";
+            fire_text += "                      \n";
+            if (ImGui::Button(fire_text.c_str())) {
+                std::cout << "fired\n";
+            }
+            ImGui::End();
+        }
+
+        {
+            ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.305));
+            ImGui::SetNextWindowSize(ImVec2(x_size * 0.29, y_size * 0.69));
+            ImGui::Begin("Automation", nullptr);
+            ImGui::SeparatorText("Valve Timings");
+            for (int i = 0; i < valve_timings.size(); i++) {
+                std::string name;
+                name = "Valve " + std::to_string(i);
+                ImGui::Text(name.c_str());
+                name = "##" + std::to_string(i);
+                ImGui::SameLine();
+                ImGui::DragFloatRange2(name.c_str(), &valve_timings[i].first, &valve_timings[i].second, 10.0f, 0.0f, 30000.0f, "Open: T + %.0f ms", "Close: T + %.0f ms", ImGuiSliderFlags_AlwaysClamp);
+            }
+            ImGui::SeparatorText("Valve Actuation");
+            ImGui::End();
+        }
+
+        {
+            ImGui::SetNextWindowPos(ImVec2(x_size * 0.305, y_size * 0.005));
+            ImGui::SetNextWindowSize(ImVec2(x_size * 0.69, y_size * 0.29));
+            ImGui::Begin("Communications", nullptr);
+            ImGui::End();
+        }
 
         image_window("rocket window", rocket, ImVec2(x_size * 0.45, y_size * 0.45), ImVec2(x_size * 0.1, y_size * 0.3));
 
-        graph_window("Pressure (MPa)", history_pressure, 0, 1000, ImPlotColormap_Viridis, ImVec2(x_size * 0.55, y_size * 0.3), ImVec2(x_size * 0.4, y_size * 0.15));
-        graph_window("Temperature (*C)", history_temperature, 0, 500, ImPlotColormap_Hot, ImVec2(x_size * 0.55, y_size * 0.45), ImVec2(x_size * 0.4, y_size * 0.3));
-        graph_window("Thrust (kN)", history_thrust, 0, 10, colormap_green, ImVec2(x_size * 0.55, y_size * 0.75), ImVec2(x_size * 0.4, y_size * 0.1));
-        graph_window("Vibration (m/s^2)", history_vibration, 0, 100, colormap_pink, ImVec2(x_size * 0.55, y_size * 0.85), ImVec2(x_size * 0.4, y_size * 0.1));
+        graph_window("Pressure (MPa)", history_pressure, 0, 1000, ImPlotColormap_Viridis, ImVec2(x_size * 0.585, y_size * 0.335), ImVec2(x_size * 0.4, y_size * 0.15));
+        graph_window("Temperature (*C)", history_temperature, 0, 500, ImPlotColormap_Hot, ImVec2(x_size * 0.585, y_size * 0.485), ImVec2(x_size * 0.4, y_size * 0.3));
+        graph_window("Thrust (kN)", history_thrust, 0, 10, colormap_green, ImVec2(x_size * 0.585, y_size * 0.785), ImVec2(x_size * 0.4, y_size * 0.1));
+        graph_window("Vibration (m/s^2)", history_vibration, 0, 100, colormap_pink, ImVec2(x_size * 0.585, y_size * 0.885), ImVec2(x_size * 0.4, y_size * 0.1));
 
         
         // Rendering

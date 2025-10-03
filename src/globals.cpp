@@ -1,6 +1,7 @@
 #include "globals.h"
 
 image rocket;
+std::vector<std::pair<float, float>> valve_timings(10, std::pair<float, float>(0, 0));
 data_history history_temperature(3000, 8, data_channel<std::string>({"ENGINE TOP", "", "", "", "", "", "", "ENGINE BOTTOM"}));
 data_history history_pressure(3000, 5, data_channel<std::string>({"NO2 TANK", "IPA TANK", "NO2 LINE", "IPA LINE", "CHAMBER"}));
 data_history history_thrust(3000, 1, data_channel<std::string>({""}));
