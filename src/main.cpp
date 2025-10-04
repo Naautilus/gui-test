@@ -9,8 +9,6 @@ int main() {
     auto time_interval = std::chrono::microseconds((int)(DELTA_T * 1e6));
     std::thread t(start_renderer);
 
-    int tick = 0;
-
     std::vector<double> simulated_pressure;
     std::vector<double> simulated_temperature;
     std::vector<double> simulated_thrust;
@@ -22,39 +20,39 @@ int main() {
     double base_simulated_thrust;
     double base_simulated_vibration;
 
-    std::vector<double> weighted_simulated_pressure(history_pressure.get_width(), 0);
-    std::vector<double> weighted_simulated_temperature(history_temperature.get_width(), 0);
-    std::vector<double> weighted_simulated_thrust(history_thrust.get_width(), 0);
-    std::vector<double> weighted_simulated_vibration(history_vibration.get_width(), 0);
+    std::vector<double> weighted_simulated_pressure(globals::history_pressure.get_width(), 0);
+    std::vector<double> weighted_simulated_temperature(globals::history_temperature.get_width(), 0);
+    std::vector<double> weighted_simulated_thrust(globals::history_thrust.get_width(), 0);
+    std::vector<double> weighted_simulated_vibration(globals::history_vibration.get_width(), 0);
 
     srand(time(NULL));
 
-    while (true) {
+    for (int tick = 0; true; tick++) {
 
-        double time = tick * DELTA_T - 10;
+        if (globals::fired) globals::time += DELTA_T;
 
-        if (time < 0) {
+        if (globals::time <= 0) {
             base_simulated_pressure_high = 800;
             base_simulated_pressure_low = 0;
             base_simulated_temperature = 20;
             base_simulated_thrust = 0;
             base_simulated_vibration = 0;
-        } else if (time < 3) {
+        } else if (globals::time < 3) {
             base_simulated_pressure_high = 800;
-            base_simulated_pressure_low = 300 * log(time + 1);
-            base_simulated_temperature = 100 * log(time + 1) + 20;
-            base_simulated_thrust = 1 * time;
-            base_simulated_vibration = ((time + 2) * (5-time)) * 8 + 10;
-        } else if (time < 10) {
-            base_simulated_pressure_high = -10 * time + 800;
-            base_simulated_pressure_low = -10 * time + 600;
-            base_simulated_temperature = 400 * log(time + 1) - 400;
-            base_simulated_thrust = -0.1 * time + 6;
-            base_simulated_vibration = -5 * time + 50;
+            base_simulated_pressure_low = 300 * log(globals::time + 1);
+            base_simulated_temperature = 100 * log(globals::time + 1) + 20;
+            base_simulated_thrust = 1 * globals::time;
+            base_simulated_vibration = ((globals::time + 2) * (5-globals::time)) * 8 + 10;
+        } else if (globals::time < 10) {
+            base_simulated_pressure_high = -10 * globals::time + 800;
+            base_simulated_pressure_low = -10 * globals::time + 600;
+            base_simulated_temperature = 400 * log(globals::time + 1) - 400;
+            base_simulated_thrust = -0.1 * globals::time + 6;
+            base_simulated_vibration = -5 * globals::time + 50;
         } else {
             base_simulated_pressure_high = 700;
             base_simulated_pressure_low = 0;
-            base_simulated_temperature = -5 * time + 500;
+            base_simulated_temperature = -5 * globals::time + 500;
             base_simulated_thrust = 0;
             base_simulated_vibration = 0;
         }
@@ -90,14 +88,18 @@ int main() {
         auto time_start = std::chrono::high_resolution_clock::now();
 
         {
-            std::lock_guard<std::mutex> lock(history_mutex);
-            history_pressure.update_data(data_channel(simulated_pressure));
-            history_temperature.update_data(data_channel(simulated_temperature));
-            history_thrust.update_data(data_channel(simulated_thrust));
-            history_vibration.update_data(data_channel(simulated_vibration));
+            std::lock_guard<std::mutex> lock(globals::history_mutex);
+            globals::history_pressure.update_data(data_channel(simulated_pressure));
+            globals::history_temperature.update_data(data_channel(simulated_temperature));
+            globals::history_thrust.update_data(data_channel(simulated_thrust));
+            globals::history_vibration.update_data(data_channel(simulated_vibration));
+
+            std::vector<double> valves_as_doubles;
+            std::vector<valve> valves_ = globals::valves.get_data();
+            for (valve& v : valves_) valves_as_doubles.push_back(v.is_open(globals::time) ? 1.0 : 0.0);
+            globals::history_valves.update_data(data_channel(valves_as_doubles));
         }
 
-        while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
-        tick++;
+        if (tick > 3000) while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
     }
 }

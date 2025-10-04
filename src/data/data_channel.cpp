@@ -1,4 +1,5 @@
 #include "data_channel.h"
+#include "valve.h"
 #include <iostream>
 #include <cmath>
 #include <numeric>
@@ -14,11 +15,12 @@ std::string data_channel<std::string>::reset_value() {
 }
 
 template <>
-void data_channel<double>::verify_data() {
-    if (data.size() != width) {
-        std::cerr << "data_channel data size (" << data.size() << ") != width (" << width << "), resetting values\n";
-        data = std::vector<double>(width, reset_value());
-    }
+valve data_channel<valve>::reset_value() {
+    return valve();
+}
+
+template <>
+void data_channel<double>::verify_data_numerics() {
     for (double& num : data) {
         if (!std::isnan(num)) continue;
         std::cerr << "data_channel data value is NaN: coercing to double::lowests\n";
@@ -27,11 +29,18 @@ void data_channel<double>::verify_data() {
 }
 
 template <>
-void data_channel<std::string>::verify_data() {
+void data_channel<std::string>::verify_data_numerics() {}
+
+template <>
+void data_channel<valve>::verify_data_numerics() {}
+
+template <typename T>
+void data_channel<T>::verify_data() {
     if (data.size() != width) {
         std::cerr << "data_channel data size (" << data.size() << ") != width (" << width << "), resetting values\n";
-        data = std::vector<std::string>(width, reset_value());
+        data = std::vector<T>(width, reset_value());
     }
+    verify_data_numerics();
 }
 
 template <typename T>
@@ -71,3 +80,4 @@ std::vector<T> data_channel<T>::get_data() {
 
 template struct data_channel<double>;
 template struct data_channel<std::string>;
+template struct data_channel<valve>;

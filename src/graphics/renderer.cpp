@@ -10,8 +10,8 @@
 #include <GLFW/glfw3.h>
 #include "image/image.h"
 #include <vector>
-#include "data/data_channel.h"
-#include "data/data_history.h"
+#include "../data/data_channel.h"
+#include "../data/data_history.h"
 #include "../globals.h"
 
 const double WINDOW_SIZE_BUFFER = 25;
@@ -42,7 +42,7 @@ void image_window(std::string name, image& image, ImVec2 pos, ImVec2 size) {
 }
 
 void graph_window(std::string name, data_history data_history_, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
-    std::lock_guard<std::mutex> lock(history_mutex);    
+    std::lock_guard<std::mutex> lock(globals::history_mutex);    
     ImGui::SetNextWindowPos(pos);
     ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER * content_scale, size.y + WINDOW_SIZE_BUFFER * content_scale));
 
@@ -133,7 +133,7 @@ void start_renderer()
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
-    initialize_images();
+    globals::initialize_images();
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -163,6 +163,7 @@ void start_renderer()
 
     ImPlotColormap colormap_green;
     ImPlotColormap colormap_pink;
+    ImPlotColormap colormap_blue;
     {
         std::vector<ImU32> colors = {ImColor(0, 30, 0), ImColor(0, 255, 0), ImColor(200, 255, 200)};
         colormap_green = ImPlot::AddColormap("green", &colors[0], colors.size(), false);
@@ -171,6 +172,11 @@ void start_renderer()
     {
         std::vector<ImU32> colors = {ImColor(30, 0, 30), ImColor(255, 0, 255), ImColor(255, 200, 255)};
         colormap_pink = ImPlot::AddColormap("pink", &colors[0], colors.size(), false);
+    }
+
+    {
+        std::vector<ImU32> colors = {ImColor(0, 15, 30), ImColor(0, 127, 255)};
+        colormap_blue = ImPlot::AddColormap("blue", &colors[0], colors.size(), false);
     }
 
     // Main loop
@@ -234,7 +240,7 @@ void start_renderer()
 
         {
             ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.005));
-            ImGui::SetNextWindowSize(ImVec2(x_size * 0.29, y_size * 0.29));
+            ImGui::SetNextWindowSize(ImVec2(x_size * 0.37, y_size * 0.37));
             ImGui::Begin("Control", nullptr);
             std::string fire_text;
             fire_text += "                      \n";
@@ -244,40 +250,64 @@ void start_renderer()
             fire_text += "                      \n";
             if (ImGui::Button(fire_text.c_str())) {
                 std::cout << "fired\n";
+                globals::fired = true;
             }
             ImGui::End();
         }
 
         {
-            ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.305));
-            ImGui::SetNextWindowSize(ImVec2(x_size * 0.29, y_size * 0.69));
+            ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.385));
+            ImGui::SetNextWindowSize(ImVec2(x_size * 0.37, y_size * 0.61));
             ImGui::Begin("Automation", nullptr);
+
             ImGui::SeparatorText("Valve Timings");
-            for (int i = 0; i < valve_timings.size(); i++) {
-                std::string name;
-                name = "Valve " + std::to_string(i);
-                ImGui::Text(name.c_str());
-                name = "##" + std::to_string(i);
-                ImGui::SameLine();
-                ImGui::DragFloatRange2(name.c_str(), &valve_timings[i].first, &valve_timings[i].second, 10.0f, 0.0f, 30000.0f, "Open: T + %.0f ms", "Close: T + %.0f ms", ImGuiSliderFlags_AlwaysClamp);
+            std::vector<valve> valves_ = globals::valves.get_data();
+            for (valve& v : valves_) {
+                float open_time = (float)v.open_time;
+                float close_time = (float)v.close_time;
+                ImGui::DragFloatRange2(v.get_name().c_str(), &open_time, &close_time, 0.01f, -1.0f, 30.0f, "Open: T + %.3f s", "Close: T + %.3f s", ImGuiSliderFlags_AlwaysClamp);
+                v.open_time = (double)open_time;
+                v.close_time = (double)close_time;
             }
+
             ImGui::SeparatorText("Valve Actuation");
+            
+            bool manual_activation;
+            {
+                static int valve_activation_mode = 0;
+                ImGui::RadioButton("Manual", &valve_activation_mode, 0);
+                ImGui::SameLine();
+                ImGui::RadioButton("Automatic", &valve_activation_mode, 1);
+                manual_activation = (valve_activation_mode == 0);
+            }
+
+            if (!manual_activation) ImGui::BeginDisabled();
+            for (valve& v : valves_) {
+                bool activated = v.is_open(globals::time);
+                ImGui::Checkbox(v.get_name().c_str(), &activated);
+                if (manual_activation) v.set_to_manual_activation(activated);
+                else v.set_to_automatic_activation(); // this isn't necessary to run each frame, but might as well
+            }
+            globals::valves.set_data(valves_);
+            if (!manual_activation) ImGui::EndDisabled();
+
             ImGui::End();
         }
 
         {
-            ImGui::SetNextWindowPos(ImVec2(x_size * 0.305, y_size * 0.005));
-            ImGui::SetNextWindowSize(ImVec2(x_size * 0.69, y_size * 0.29));
+            ImGui::SetNextWindowPos(ImVec2(x_size * 0.385, y_size * 0.005));
+            ImGui::SetNextWindowSize(ImVec2(x_size * 0.61, y_size * 0.37));
             ImGui::Begin("Communications", nullptr);
             ImGui::End();
         }
 
-        image_window("rocket window", rocket, ImVec2(x_size * 0.45, y_size * 0.45), ImVec2(x_size * 0.1, y_size * 0.3));
+        image_window("rocket window", globals::rocket, ImVec2(x_size * 0.475, y_size * 0.65), ImVec2(x_size * 0.1, y_size * 0.3));
 
-        graph_window("Pressure (MPa)", history_pressure, 0, 1000, ImPlotColormap_Viridis, ImVec2(x_size * 0.585, y_size * 0.335), ImVec2(x_size * 0.4, y_size * 0.15));
-        graph_window("Temperature (*C)", history_temperature, 0, 500, ImPlotColormap_Hot, ImVec2(x_size * 0.585, y_size * 0.485), ImVec2(x_size * 0.4, y_size * 0.3));
-        graph_window("Thrust (kN)", history_thrust, 0, 10, colormap_green, ImVec2(x_size * 0.585, y_size * 0.785), ImVec2(x_size * 0.4, y_size * 0.1));
-        graph_window("Vibration (m/s^2)", history_vibration, 0, 100, colormap_pink, ImVec2(x_size * 0.585, y_size * 0.885), ImVec2(x_size * 0.4, y_size * 0.1));
+        graph_window("Valve Activations", globals::history_valves, 0.0, 1.0, colormap_blue, ImVec2(x_size * 0.635, y_size * 0.375), ImVec2(x_size * 0.35, y_size * 0.15));
+        graph_window("Pressure (MPa)", globals::history_pressure, 0.0, 1000.0, ImPlotColormap_Viridis, ImVec2(x_size * 0.635, y_size * 0.525), ImVec2(x_size * 0.35, y_size * 0.15));
+        graph_window("Temperature (*C)", globals::history_temperature, 0.0, 500.0, ImPlotColormap_Hot, ImVec2(x_size * 0.635, y_size * 0.675), ImVec2(x_size * 0.35, y_size * 0.15));
+        graph_window("Thrust (kN)", globals::history_thrust, 0.0, 10.0, colormap_green, ImVec2(x_size * 0.635, y_size * 0.825), ImVec2(x_size * 0.35, y_size * 0.08));
+        graph_window("Vibration (m/s^2)", globals::history_vibration, 0.0, 100.0, colormap_pink, ImVec2(x_size * 0.635, y_size * 0.905), ImVec2(x_size * 0.35, y_size * 0.08));
 
         
         // Rendering

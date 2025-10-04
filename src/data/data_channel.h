@@ -6,6 +6,7 @@ class data_channel {
     size_t width;
     std::vector<T> data;
     T reset_value();
+    void verify_data_numerics();
     public:
     void verify_data();
     data_channel();
