@@ -1,6 +1,8 @@
 #include "renderer.h"
+#include <iostream>
 #include <string>
 #include <vector>
+#include <math.h>
 #include <GLFW/glfw3.h>
 #include "imgui.h"
 #include "implot.h"
