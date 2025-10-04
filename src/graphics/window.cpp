@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <math.h>
-#include <GLFW/glfw3.h>
 #include "imgui.h"
 #include "implot.h"
 #include "backends/imgui_impl_glfw.h"
@@ -13,35 +12,35 @@
 #include "../data/data_history.h"
 #include "../globals/globals.h"
 
-namespace renderer {
+namespace graphics {
 
-void image_window(std::string name, image& image, ImVec2 pos, ImVec2 size) {
+void renderer::image_window(std::string name, image& image, ImVec2 pos, ImVec2 size) {
     ImGui::SetNextWindowPos(pos);
     ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER * content_scale, size.y + WINDOW_SIZE_BUFFER * content_scale));
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground
-                                    | ImGuiWindowFlags_NoBringToFrontOnFocus
-                                    | ImGuiWindowFlags_NoFocusOnAppearing
-                                    | ImGuiWindowFlags_NoResize
-                                    | ImGuiWindowFlags_NoMove
-                                    | ImGuiWindowFlags_NoTitleBar;
+                                  | ImGuiWindowFlags_NoBringToFrontOnFocus
+                                  | ImGuiWindowFlags_NoFocusOnAppearing
+                                  | ImGuiWindowFlags_NoResize
+                                  | ImGuiWindowFlags_NoMove
+                                  | ImGuiWindowFlags_NoTitleBar;
 
     ImGui::Begin(name.c_str(), nullptr, window_flags);
     ImGui::Image((ImTextureID)(intptr_t)image.texture, size);
     ImGui::End();
 }
 
-void graph_window(std::string name, data_history data_history_, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
+void renderer::graph_window(std::string name, data_history data_history_, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
     std::lock_guard<std::mutex> lock(globals::history_mutex);    
     ImGui::SetNextWindowPos(pos);
     ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER * content_scale, size.y + WINDOW_SIZE_BUFFER * content_scale));
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground
-                                    | ImGuiWindowFlags_NoFocusOnAppearing
-                                    | ImGuiWindowFlags_NoResize
-                                    | ImGuiWindowFlags_NoMove
-                                    | ImGuiWindowFlags_NoTitleBar
-                                    | ImGuiWindowFlags_NoInputs;
+                                  | ImGuiWindowFlags_NoFocusOnAppearing
+                                  | ImGuiWindowFlags_NoResize
+                                  | ImGuiWindowFlags_NoMove
+                                  | ImGuiWindowFlags_NoTitleBar
+                                  | ImGuiWindowFlags_NoInputs;
 
     ImGui::Begin(name.c_str(), nullptr, window_flags);
 
@@ -49,11 +48,11 @@ void graph_window(std::string name, data_history data_history_, double min, doub
         ImPlot::PushColormap(colormap);
 
         static ImPlotAxisFlags axis_flags = ImPlotAxisFlags_Lock 
-                                        | ImPlotAxisFlags_NoGridLines 
-                                        | ImPlotAxisFlags_NoTickMarks 
-                                        | ImPlotAxisFlags_NoTickLabels
-                                        | ImPlotAxisFlags_NoDecorations
-                                        | ImPlotAxisFlags_NoLabel;
+                                          | ImPlotAxisFlags_NoGridLines 
+                                          | ImPlotAxisFlags_NoTickMarks 
+                                          | ImPlotAxisFlags_NoTickLabels
+                                          | ImPlotAxisFlags_NoDecorations
+                                          | ImPlotAxisFlags_NoLabel;
 
         if (ImPlot::BeginPlot("##Heatmap1", ImVec2(size.x - x_size * 0.05, size.y))) {
             ImPlot::SetupAxes(nullptr, nullptr, axis_flags, axis_flags);
@@ -92,7 +91,7 @@ void graph_window(std::string name, data_history data_history_, double min, doub
     ImGui::End();
 }
 
-void control_window() {
+void renderer::control_window() {
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.005));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.37, y_size * 0.37));
     ImGui::Begin("Control", nullptr);
@@ -110,7 +109,7 @@ void control_window() {
     ImGui::End();
 }
 
-void automation_window() {
+void renderer::automation_window() {
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.385));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.37, y_size * 0.61));
     ImGui::Begin("Automation", nullptr);
@@ -149,7 +148,7 @@ void automation_window() {
     ImGui::End();
 }
 
-void communications_window() {
+void renderer::communications_window() {
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.385, y_size * 0.005));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.61, y_size * 0.37));
     ImGui::Begin("Communications", nullptr);

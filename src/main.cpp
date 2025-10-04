@@ -8,7 +8,8 @@ int main() {
     const double DELTA_T = 0.01;
 
     auto time_interval = std::chrono::microseconds((int)(DELTA_T * 1e6));
-    std::thread t(renderer::start_renderer);
+
+    std::thread t(graphics::start_renderer);
 
     srand(time(NULL));
     simulated_data simulated_data_;
