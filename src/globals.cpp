@@ -2,6 +2,10 @@
 
 namespace globals {
 
+bool enable_tx = true;
+bool enable_rx = true;
+std::optional<std::chrono::high_resolution_clock::time_point> last_rx = std::nullopt;
+
 bool fired = false;
 double time = 0;
 image rocket;
