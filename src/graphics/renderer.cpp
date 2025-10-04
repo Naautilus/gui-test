@@ -304,10 +304,10 @@ void start_renderer()
         image_window("rocket window", globals::rocket, ImVec2(x_size * 0.475, y_size * 0.65), ImVec2(x_size * 0.1, y_size * 0.3));
 
         graph_window("Valve Activations", globals::history_valves, 0.0, 1.0, colormap_blue, ImVec2(x_size * 0.635, y_size * 0.375), ImVec2(x_size * 0.35, y_size * 0.15));
-        graph_window("Pressure (MPa)", globals::history_pressure, 0.0, 1000.0, ImPlotColormap_Viridis, ImVec2(x_size * 0.635, y_size * 0.525), ImVec2(x_size * 0.35, y_size * 0.15));
-        graph_window("Temperature (*C)", globals::history_temperature, 0.0, 500.0, ImPlotColormap_Hot, ImVec2(x_size * 0.635, y_size * 0.675), ImVec2(x_size * 0.35, y_size * 0.15));
-        graph_window("Thrust (kN)", globals::history_thrust, 0.0, 10.0, colormap_green, ImVec2(x_size * 0.635, y_size * 0.825), ImVec2(x_size * 0.35, y_size * 0.08));
-        graph_window("Vibration (m/s^2)", globals::history_vibration, 0.0, 100.0, colormap_pink, ImVec2(x_size * 0.635, y_size * 0.905), ImVec2(x_size * 0.35, y_size * 0.08));
+        graph_window("Pressure (mmHg)", globals::history_pressure, 0.0, 1000.0, ImPlotColormap_Viridis, ImVec2(x_size * 0.635, y_size * 0.525), ImVec2(x_size * 0.35, y_size * 0.15));
+        graph_window("Temperature (Rankine)", globals::history_temperature, 0.0, 500.0, ImPlotColormap_Hot, ImVec2(x_size * 0.635, y_size * 0.675), ImVec2(x_size * 0.35, y_size * 0.15));
+        graph_window("Thrust (stones)", globals::history_thrust, 0.0, 10.0, colormap_green, ImVec2(x_size * 0.635, y_size * 0.825), ImVec2(x_size * 0.35, y_size * 0.08));
+        graph_window("Vibration (ft/min^2)", globals::history_vibration, 0.0, 100.0, colormap_pink, ImVec2(x_size * 0.635, y_size * 0.905), ImVec2(x_size * 0.35, y_size * 0.08));
 
         
         // Rendering
