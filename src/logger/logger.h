@@ -4,5 +4,5 @@
 struct logger {
     std::ofstream file;
     logger(std::string filepath);
-    write(bool title);
-}
+    void write(bool title);
+};

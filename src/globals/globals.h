@@ -1,7 +1,7 @@
 #pragma once
-#include "graphics/image/image.h"
-#include "data/data_history.h"
-#include "data/valve.h"
+#include "../graphics/image/image.h"
+#include "../data/data_history.h"
+#include "../data/valve.h"
 #include <mutex>
 #include <chrono>
 #include <optional>

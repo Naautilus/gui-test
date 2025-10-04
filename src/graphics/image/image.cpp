@@ -5,7 +5,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
-#include "../../globals.h"
+#include "../../globals/globals.h"
 #include "../renderer.h"
 #include <iostream>
 

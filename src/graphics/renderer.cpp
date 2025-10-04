@@ -13,7 +13,7 @@
 #include "image/image.h"
 #include "../data/data_channel.h"
 #include "../data/data_history.h"
-#include "../globals.h"
+#include "../globals/globals.h"
 
 const double WINDOW_SIZE_BUFFER = 25;
 const double GRAPH_BORDER_WIDTH = 5;

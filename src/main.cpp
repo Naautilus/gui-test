@@ -1,7 +1,7 @@
 #include <thread>
 #include "math.h"
 #include "graphics/renderer.h"
-#include "globals.h"
+#include "globals/globals.h"
 
 int main() {
     const double DELTA_T = 0.01;
