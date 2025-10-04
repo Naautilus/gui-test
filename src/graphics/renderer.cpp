@@ -285,7 +285,7 @@ void start_renderer()
 
             if (!manual_activation) ImGui::BeginDisabled();
             for (valve& v : valves_) {
-                bool activated = v.is_open(globals::time);
+                bool activated = v.is_open(globals::sequence_time);
                 ImGui::Checkbox(v.get_name().c_str(), &activated);
                 if (manual_activation) v.set_to_manual_activation(activated);
                 else v.set_to_automatic_activation(); // this isn't necessary to run each frame, but might as well

@@ -29,30 +29,30 @@ int main() {
 
     for (int tick = 0; true; tick++) {
 
-        if (globals::fired) globals::time += DELTA_T;
+        if (globals::fired) globals::sequence_time += DELTA_T;
 
-        if (globals::time <= 0) {
+        if (globals::sequence_time <= 0) {
             base_simulated_pressure_high = 800;
             base_simulated_pressure_low = 0;
             base_simulated_temperature = 20;
             base_simulated_thrust = 0;
             base_simulated_vibration = 0;
-        } else if (globals::time < 3) {
+        } else if (globals::sequence_time < 3) {
             base_simulated_pressure_high = 800;
-            base_simulated_pressure_low = 300 * log(globals::time + 1);
-            base_simulated_temperature = 100 * log(globals::time + 1) + 20;
-            base_simulated_thrust = 1 * globals::time;
-            base_simulated_vibration = ((globals::time + 2) * (5-globals::time)) * 8 + 10;
-        } else if (globals::time < 10) {
-            base_simulated_pressure_high = -10 * globals::time + 800;
-            base_simulated_pressure_low = -10 * globals::time + 600;
-            base_simulated_temperature = 400 * log(globals::time + 1) - 400;
-            base_simulated_thrust = -0.1 * globals::time + 6;
-            base_simulated_vibration = -5 * globals::time + 50;
+            base_simulated_pressure_low = 300 * log(globals::sequence_time + 1);
+            base_simulated_temperature = 100 * log(globals::sequence_time + 1) + 20;
+            base_simulated_thrust = 1 * globals::sequence_time;
+            base_simulated_vibration = ((globals::sequence_time + 2) * (5-globals::sequence_time)) * 8 + 10;
+        } else if (globals::sequence_time < 10) {
+            base_simulated_pressure_high = -10 * globals::sequence_time + 800;
+            base_simulated_pressure_low = -10 * globals::sequence_time + 600;
+            base_simulated_temperature = 400 * log(globals::sequence_time + 1) - 400;
+            base_simulated_thrust = -0.1 * globals::sequence_time + 6;
+            base_simulated_vibration = -5 * globals::sequence_time + 50;
         } else {
             base_simulated_pressure_high = 700;
             base_simulated_pressure_low = 0;
-            base_simulated_temperature = -5 * globals::time + 500;
+            base_simulated_temperature = -5 * globals::sequence_time + 500;
             base_simulated_thrust = 0;
             base_simulated_vibration = 0;
         }
@@ -96,7 +96,7 @@ int main() {
 
             std::vector<double> valves_as_doubles;
             std::vector<valve> valves_ = globals::valves.get_data();
-            for (valve& v : valves_) valves_as_doubles.push_back(v.is_open(globals::time) ? 1.0 : 0.0);
+            for (valve& v : valves_) valves_as_doubles.push_back(v.is_open(globals::sequence_time) ? 1.0 : 0.0);
             globals::history_valves.update_data(data_channel(valves_as_doubles));
         }
 

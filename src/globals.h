@@ -12,7 +12,7 @@ extern bool enable_tx;
 extern bool enable_rx;
 extern std::optional<std::chrono::high_resolution_clock::time_point> last_rx;
 extern bool fired;
-extern double time;
+extern double sequence_time;
 extern image rocket;
 extern data_channel<valve> valves;
 extern data_history history_temperature;
