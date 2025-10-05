@@ -1,8 +1,13 @@
 #pragma once
 #include <fstream>
+#include <chrono>
 
-struct logger {
+class logger {
+    std::chrono::high_resolution_clock::time_point start_time;
+    std::string filename;
     std::ofstream file;
-    logger(std::string filepath);
-    void write(bool title);
+    public:
+    logger(std::string name);
+    void write(bool title = false);
+    std::string get_filename();
 };

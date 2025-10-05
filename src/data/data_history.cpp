@@ -57,7 +57,7 @@ data_channel<std::string> data_history::get_labels() {
 std::vector<double> data_history::get_1d_vector() {
     std::vector<double> output(length * width, std::numeric_limits<double>::lowest());
     for (int i = 0; i < length; i++) {
-        std::vector<double> data = history[i].get_data();
+        std::vector<double> data = history[length - i - 1].get_data();
         for (int j = 0; j < width; j++) {
             output[i + length * j] = data[j];
         }

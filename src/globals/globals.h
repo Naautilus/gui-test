@@ -2,6 +2,7 @@
 #include "../graphics/image/image.h"
 #include "../data/data_history.h"
 #include "../data/valve.h"
+#include "../logger/logger.h"
 #include <mutex>
 #include <chrono>
 #include <optional>
@@ -21,6 +22,7 @@ extern data_history history_thrust;
 extern data_history history_vibration;
 extern data_history history_valves;
 extern std::mutex history_mutex;
+extern std::vector<logger> loggers;
 
 void initialize_images();
 

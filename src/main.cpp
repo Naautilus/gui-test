@@ -7,6 +7,8 @@
 int main() {
     const double DELTA_T = 0.01;
 
+    globals::loggers.push_back(logger("autolog"));
+
     auto time_interval = std::chrono::microseconds((int)(DELTA_T * 1e6));
 
     std::thread t(graphics::start_renderer);
@@ -19,6 +21,8 @@ int main() {
         
         if (globals::fired) globals::sequence_time += DELTA_T;
         simulated_data_.update();
+
+        for (logger& l : globals::loggers) l.write();
 
         if (tick > 3000) while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
     }

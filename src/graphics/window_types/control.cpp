@@ -18,6 +18,7 @@ void renderer::control_window() {
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.005));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.37, y_size * 0.37));
     ImGui::Begin("Control", nullptr);
+    ImGui::SeparatorText("Sequence Control");
     std::string fire_text;
     fire_text += "                      \n";
     fire_text += "      ----------      \n";
@@ -28,6 +29,18 @@ void renderer::control_window() {
         std::cout << "fired\n";
         globals::fired = true;
         globals::last_rx = std::chrono::high_resolution_clock::now();
+    }
+    ImGui::SeparatorText("Loggers");
+    for (int i = 0; i < globals::loggers.size(); i++) {
+        logger& l = globals::loggers[i];
+        ImGui::Text("(o)");
+        ImGui::SameLine();
+        ImGui::Text(l.get_filename().c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Stop")) {
+            globals::loggers.erase(globals::loggers.begin() + i);
+            break;
+        }
     }
     ImGui::End();
 }
