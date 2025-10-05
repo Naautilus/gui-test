@@ -64,7 +64,7 @@ void renderer::control_window() {
         if (ImGui::Button("FIRE", large_button_size)) {
             std::cout << "fired\n";
             globals::fired = true;
-            globals::loggers.push_back(logger("sequence_log", globals::sequence_max_time));
+            add_logger(logger_type::sequence, globals::sequence_max_time);
         }
         ImGui::SameLine();
         if (disabled) ImGui::EndDisabled();
@@ -120,7 +120,7 @@ void renderer::control_window() {
         bool allow_more_loggers = (globals::loggers.size() < 5);
         if (!allow_more_loggers) ImGui::BeginDisabled();
         if (ImGui::Button("+")) {
-            globals::loggers.push_back(logger("manual_log"));
+            add_logger(logger_type::manual);
         }
         if (!allow_more_loggers) ImGui::EndDisabled();
     }

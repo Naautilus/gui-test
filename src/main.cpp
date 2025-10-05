@@ -8,7 +8,7 @@ int main() {
     const double DELTA_T = 0.001;
 
     globals::globals_mutex.lock();
-    globals::loggers.push_back(logger("auto_log"));
+    add_logger(logger_type::automatic);
     globals::globals_mutex.unlock();
 
     auto time_interval = std::chrono::microseconds((int)(DELTA_T * 1e6));

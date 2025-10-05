@@ -3,13 +3,17 @@
 #include <iostream>
 #include <ctime>
 
-logger::logger(std::string name, double duration_) {
+logger::logger(logger_type logger_type__, std::optional<double> duration_) {
+
+    logger_type_ = logger_type__;
+
     time_t now;
     time(&now);
     char timestamp[sizeof("_YYYY-MM-DD_HH-MM-SS")];
     strftime(timestamp, sizeof(timestamp), "_%Y-%m-%d_%H-%M-%S", localtime(&now));
 
-    filename = name;
+    filename = get_name_for_logger_type();
+    filename += "_log_";
     filename += timestamp;
     filename += ".tsv";
 
@@ -20,12 +24,27 @@ logger::logger(std::string name, double duration_) {
 
     start_time = std::chrono::high_resolution_clock::now();
 
-    if (duration_ < 0) duration = std::nullopt;
-    else duration = std::make_optional(duration_);
+    duration = duration_;
+}
+
+void logger::set_duration(std::optional<double> duration_) {
+    start_time = std::chrono::high_resolution_clock::now();
+    duration = duration_;
 }
 
 std::optional<double> logger::get_duration() {
     return duration;
+}
+
+std::string logger::get_name_for_logger_type() {
+    switch (logger_type_) {
+        case logger_type::automatic: return "auto";
+        case logger_type::manual: return "manual";
+        case logger_type::sequence: return "sequence";
+        case logger_type::tx: return "tx";
+        case logger_type::rx: return "rx";
+        default: return "";
+    }
 }
 
 namespace {
@@ -68,6 +87,10 @@ std::string logger::get_filename() {
     return filename;
 }
 
+logger_type logger::get_logger_type() {
+    return logger_type_;
+}
+
 void logger::calculate_bitrate() {
 
     double time_difference = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - last_bitrate_calculate_time).count();
@@ -84,4 +107,18 @@ void logger::calculate_bitrate() {
 
 double logger::get_bitrate() {
     return bits_per_second;
+}
+
+void add_logger(logger_type logger_type_, std::optional<double> duration) {
+    std::optional<logger*> existing_logger_of_type = std::nullopt;
+    for (logger& l : globals::loggers) {
+        if (l.get_logger_type() != logger_type_) continue;
+        existing_logger_of_type = std::make_optional(&l);
+    }
+
+    if (existing_logger_of_type) {
+        std::cout << "setting duration of type " << existing_logger_of_type.value()->get_filename() << "\n";
+        existing_logger_of_type.value()->set_duration(duration);
+    }
+    else globals::loggers.push_back(logger(logger_type_, duration));
 }
