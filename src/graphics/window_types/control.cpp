@@ -42,7 +42,7 @@ void renderer::control_window() {
     {
         float sequence_max_time_ = globals::sequence_max_time;
         ImGui::SetNextItemWidth(ImGui::CalcTextSize(" 120.0 s ").x);
-        ImGui::DragFloat("Sequence Time Limit", &sequence_max_time_, 0.1f, 0.0f, 120.0f, "%.1f s");
+        ImGui::DragFloat("Sequence Time Limit", &sequence_max_time_, 0.1f, 2.0f, 120.0f, "%.1f s");
         globals::sequence_max_time = sequence_max_time_;
     }
 
@@ -59,9 +59,16 @@ void renderer::control_window() {
     ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x - ImGui::CalcTextSize(" ").x * 0.5, ImGui::GetCursorPos().y));
     ImGui::Text("%.1f Mbps", (float)bitrate_sum);
 
-    if (ImGui::Button("+")) {
-        globals::loggers.push_back(logger("manual_log"));
+    {
+        bool allow_more_loggers = (globals::loggers.size() < 5);
+        if (!allow_more_loggers) ImGui::BeginDisabled();
+        if (ImGui::Button("+")) {
+            globals::loggers.push_back(logger("manual_log"));
+        }
+        if (!allow_more_loggers) ImGui::EndDisabled();
     }
+
+
     for (int i = globals::loggers.size() - 1; i >= 0; i--) {
         logger& l = globals::loggers[i];
         if (l.get_duration() && l.time_since_creation() >= l.get_duration().value()) globals::loggers.erase(globals::loggers.begin() + i);
@@ -87,11 +94,14 @@ void renderer::control_window() {
         ImGui::Text("%.1f mbps", (float)(l.get_bitrate() / 1e6));
         ImGui::SameLine();
         {
-            std::string button_text = "Stop##" + std::to_string(i);
+            ImGui::PushFont(globals::font_deja_vu, 9.0);
+            std::string button_text = "X##" + std::to_string(i);
             if (ImGui::Button(button_text.c_str())) {
                 globals::loggers.erase(globals::loggers.begin() + i);
+                ImGui::PopFont();
                 break;
             }
+            ImGui::PopFont();
         }
     }
     ImGui::End();

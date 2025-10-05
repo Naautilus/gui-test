@@ -25,37 +25,52 @@ void renderer::automation_window() {
 
     ImGui::Begin("Automation", nullptr, window_flags);
 
-    ImGui::SeparatorText("Valve Timings");
     std::vector<valve> valves_ = globals::valves.get_data();
-    for (valve& v : valves_) {
+    
+    if (!globals::enable_tx) ImGui::SeparatorText("Valve Actuation");
+    else ImGui::SeparatorText("Valve Actuation [WARNING: Changes are live!]");
+
+    for (int i = 0; i < valves_.size(); i++) {
+        valve& v = valves_[i];
+        int valve_activation_mode;
+        if (!v.is_manual()) valve_activation_mode = 1;
+        else valve_activation_mode = 0;
+        {
+            std::string manual_text = "Constant##" + std::to_string(i);
+            std::string auto_text = "##" + std::to_string(i);
+            ImGui::RadioButton(manual_text.c_str(), &valve_activation_mode, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton(auto_text.c_str(), &valve_activation_mode, 1);
+            ImGui::SameLine();
+        }
+        bool manual_activation = (valve_activation_mode != 1);
+        
+        
+        
+        if (manual_activation) ImGui::BeginDisabled();
+
+        const float TIME_BUFFER = 0.01f;
+
+        ImGui::SetNextItemWidth(ImGui::CalcTextSize("  Open: T + %.3f s  |  Close: T + %.3f s  ").x);
+        std::string drag_name = "##" + v.get_name();
         float open_time = (float)v.open_time;
         float close_time = (float)v.close_time;
-        ImGui::DragFloatRange2(v.get_name().c_str(), &open_time, &close_time, 0.01f, -1.0f, 1000.0f, "Open: T + %.3f s", "Close: T + %.3f s", ImGuiSliderFlags_AlwaysClamp);
-        v.open_time = (double)open_time;
-        v.close_time = (double)close_time;
-    }
-
-    ImGui::SeparatorText("Valve Actuation");
-    
-    bool manual_activation;
-    {
-        static int valve_activation_mode = 0;
-        ImGui::RadioButton("Manual", &valve_activation_mode, 0);
+        ImGui::DragFloatRange2(drag_name.c_str(), &open_time, &close_time, 0.01f, TIME_BUFFER, globals::sequence_max_time - TIME_BUFFER, "Open: T + %.3f s", "Close: T + %.3f s", ImGuiSliderFlags_AlwaysClamp);
+        v.open_time = fmin((double)open_time, globals::sequence_max_time - TIME_BUFFER);
+        v.close_time = fmin((double)close_time, globals::sequence_max_time - TIME_BUFFER);
         ImGui::SameLine();
-        ImGui::RadioButton("Automatic", &valve_activation_mode, 1);
-        manual_activation = (valve_activation_mode == 0);
-    }
 
-    if (!manual_activation) ImGui::BeginDisabled();
-    for (valve& v : valves_) {
-        bool activated = activated = v.is_open(globals::sequence_time);
-        if (globals::sequence_time > globals::sequence_max_time) activated = false;
+        if (manual_activation) ImGui::EndDisabled();
+        if (!manual_activation) ImGui::BeginDisabled();
+
+        bool activated = v.is_open(globals::sequence_time, globals::sequence_max_time);
         ImGui::Checkbox(v.get_name().c_str(), &activated);
         if (manual_activation) v.set_to_manual_activation(activated);
         else v.set_to_automatic_activation(); // this isn't necessary to run each frame, but might as well
+
+        if (!manual_activation) ImGui::EndDisabled();
     }
     globals::valves.set_data(valves_);
-    if (!manual_activation) ImGui::EndDisabled();
 
     ImGui::End();
 }

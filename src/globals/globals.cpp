@@ -30,14 +30,15 @@ namespace {
 }
 
 data_channel<valve> valves({
-    valve(valve_names[0], -1.0, -1.0), 
-    valve(valve_names[1], -1.0, -1.0), 
-    valve(valve_names[2], -1.0, -1.0), 
+    valve(valve_names[0], 1.0, 2.0, std::make_optional(false)), 
+    valve(valve_names[1], 1.0, 2.0, std::make_optional(false)), 
+    valve(valve_names[2], 1.0, 2.0, std::make_optional(false)), 
     valve(valve_names[3], 1.0, 10.0), 
     valve(valve_names[4], 1.0, 10.0), 
-    valve(valve_names[5], -1.0, 30.0),
+    valve(valve_names[5], 1.0, 2.0, std::make_optional(true)),
     valve(valve_names[6], 3.0, 4.0)
 });
+
 data_history history_temperature(3000, 8, data_channel<std::string>({"ENGINE TOP", "", "", "", "", "", "", "ENGINE BOTTOM"}));
 data_history history_pressure(3000, 5, data_channel<std::string>({"NO2 TANK", "IPA TANK", "NO2 LINE", "IPA LINE", "CHAMBER"}));
 data_history history_thrust(3000, 1, data_channel<std::string>({""}));

@@ -74,7 +74,7 @@ void simulated_data::update() {
 
         std::vector<double> valves_as_doubles;
         std::vector<valve> valves_ = globals::valves.get_data();
-        for (valve& v : valves_) valves_as_doubles.push_back(v.is_open(globals::sequence_time) ? 1.0 : 0.0);
+        for (valve& v : valves_) valves_as_doubles.push_back(v.is_open(globals::sequence_time, globals::sequence_max_time) ? 1.0 : 0.0);
         globals::history_valves.update_data(data_channel(valves_as_doubles));
     }
 }
