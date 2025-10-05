@@ -3,6 +3,7 @@
 #include "../globals/globals.h"
 
 simulated_data::simulated_data() {
+    std::lock_guard<std::mutex> lock(globals::globals_mutex);
     weighted_simulated_pressure = std::vector<double>(globals::history_pressure.get_width(), 0);
     weighted_simulated_temperature = std::vector<double>(globals::history_temperature.get_width(), 0);
     weighted_simulated_thrust = std::vector<double>(globals::history_thrust.get_width(), 0);
@@ -10,6 +11,7 @@ simulated_data::simulated_data() {
 }
 
 void simulated_data::update() {
+    std::lock_guard<std::mutex> lock(globals::globals_mutex);
     if (globals::sequence_time <= 0) {
         base_simulated_pressure_high = 800;
         base_simulated_pressure_low = 0;
@@ -65,7 +67,6 @@ void simulated_data::update() {
     for (int i = 0; i < 8; i++) simulated_temperature[i] = weighted_simulated_temperature[i] * (3.0 - i / 8.0) / 3.0;
 
     {
-        std::lock_guard<std::mutex> lock(globals::history_mutex);
         globals::history_pressure.update_data(data_channel(simulated_pressure));
         globals::history_temperature.update_data(data_channel(simulated_temperature));
         globals::history_thrust.update_data(data_channel(simulated_thrust));

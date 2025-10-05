@@ -36,7 +36,7 @@ data_history history_pressure(3000, 5, data_channel<std::string>({"NO2 TANK", "I
 data_history history_thrust(3000, 1, data_channel<std::string>({""}));
 data_history history_vibration(3000, 1, data_channel<std::string>({""}));
 data_history history_valves(3000, valves.get_data().size(), data_channel<std::string>(valve_names));
-std::mutex history_mutex;
+std::mutex globals_mutex;
 std::vector<logger> loggers;
 
 void initialize_images() {

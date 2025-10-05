@@ -15,8 +15,14 @@
 namespace graphics {
     
 void renderer::automation_window() {
+    std::lock_guard<std::mutex> lock(globals::globals_mutex);
+
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.385));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.37, y_size * 0.61));
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize
+                                  | ImGuiWindowFlags_NoMove;
+
     ImGui::Begin("Automation", nullptr);
 
     ImGui::SeparatorText("Valve Timings");

@@ -15,6 +15,7 @@
 namespace graphics {
     
 void renderer::communications_window() {
+    std::lock_guard<std::mutex> lock(globals::globals_mutex);
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.385, y_size * 0.005));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.61, y_size * 0.37));
     ImGui::Begin("Communications", nullptr);

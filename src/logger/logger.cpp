@@ -2,7 +2,7 @@
 #include "../globals/globals.h"
 #include <ctime>
 
-logger::logger(std::string name) {
+logger::logger(std::string name, double duration_) {
     time_t now;
     time(&now);
     char timestamp[sizeof("_YYYY-MM-DD_HH-MM-SS")];
@@ -16,6 +16,15 @@ logger::logger(std::string name) {
     file.open(filepath, std::ios::trunc);
 
     write(true);
+
+    start_time = std::chrono::high_resolution_clock::now();
+
+    if (duration_ < 0) duration = std::nullopt;
+    else duration = std::make_optional(duration_);
+}
+
+std::optional<double> logger::get_duration() {
+    return duration;
 }
 
 namespace {
@@ -30,13 +39,15 @@ void write_data_history(std::ofstream& file, bool title, data_history& data_hist
 }
 
 void logger::write(bool title) {
-    file << (title ? "logger_time"   : std::to_string(std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_time).count())) << "\t";
+
+    if (duration && time_since_creation() > duration.value()) return;
+
+    file << (title ? "logger_time"   : std::to_string(time_since_creation())) << "\t";
     file << (title ? "enable_tx"     : std::to_string((double)globals::enable_tx)) << "\t";
     file << (title ? "enable_rx"     : std::to_string((double)globals::enable_rx)) << "\t";
     file << (title ? "fired"         : std::to_string((double)globals::fired)) << "\t";
     file << (title ? "sequence_time" : std::to_string(globals::sequence_time)) << "\t";
     {
-        std::lock_guard<std::mutex> lock(globals::history_mutex);
         write_data_history(file, title, globals::history_temperature);
         write_data_history(file, title, globals::history_pressure);
         write_data_history(file, title, globals::history_thrust);
@@ -44,6 +55,10 @@ void logger::write(bool title) {
         write_data_history(file, title, globals::history_valves);
     }
     file << "\n";
+}
+
+double logger::time_since_creation() {
+    return std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_time).count();
 }
 
 std::string logger::get_filename() {

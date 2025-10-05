@@ -15,7 +15,6 @@
 namespace graphics {
     
 void renderer::graph_window(std::string name, data_history data_history_, double min, double max, ImPlotColormap colormap, ImVec2 pos, ImVec2 size) {
-    std::lock_guard<std::mutex> lock(globals::history_mutex);    
     ImGui::SetNextWindowPos(pos);
     ImGui::SetNextWindowSize(ImVec2(size.x + WINDOW_SIZE_BUFFER * content_scale, size.y + WINDOW_SIZE_BUFFER * content_scale));
 

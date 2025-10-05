@@ -15,6 +15,7 @@
 namespace graphics {
     
 void renderer::control_window() {
+    std::lock_guard<std::mutex> lock(globals::globals_mutex);
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.005));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.37, y_size * 0.37));
     ImGui::Begin("Control", nullptr);
@@ -29,17 +30,35 @@ void renderer::control_window() {
         std::cout << "fired\n";
         globals::fired = true;
         globals::last_rx = std::chrono::high_resolution_clock::now();
+        globals::loggers.push_back(logger("sequence_log", 30.0));
     }
     ImGui::SeparatorText("Loggers");
+    if (ImGui::Button("+")) {
+        globals::loggers.push_back(logger("manual_log"));
+    }
+    for (int i = globals::loggers.size() - 1; i >= 0; i--) {
+        logger& l = globals::loggers[i];
+        if (l.get_duration() && l.time_since_creation() >= l.get_duration().value()) globals::loggers.erase(globals::loggers.begin() + i);
+    }
     for (int i = 0; i < globals::loggers.size(); i++) {
         logger& l = globals::loggers[i];
         ImGui::Text("(o)");
         ImGui::SameLine();
         ImGui::Text(l.get_filename().c_str());
         ImGui::SameLine();
-        if (ImGui::Button("Stop")) {
-            globals::loggers.erase(globals::loggers.begin() + i);
-            break;
+        if (l.get_duration()) {
+            std::string duration_text = "(";
+            duration_text += std::to_string((int)ceil(l.get_duration().value() - l.time_since_creation()));
+            duration_text += ")";
+            ImGui::Text(duration_text.c_str());
+            ImGui::SameLine();
+        }
+        {
+            std::string button_text = "Stop##" + std::to_string(i);
+            if (ImGui::Button(button_text.c_str())) {
+                globals::loggers.erase(globals::loggers.begin() + i);
+                break;
+            }
         }
     }
     ImGui::End();
