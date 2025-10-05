@@ -24,27 +24,56 @@ void renderer::control_window() {
 
     ImGui::Begin("Control", nullptr, window_flags);
     ImGui::SeparatorText("Sequence Control");
+
+
     ImGui::Checkbox("Safety", &globals::sequence_control_safety);
-    if (globals::sequence_control_safety) ImGui::BeginDisabled();
-    std::string fire_text;
-    fire_text += "                      \n";
-    fire_text += "      ----------      \n";
-    fire_text += "      |  FIRE  |      \n";
-    fire_text += "      ----------      \n";
-    fire_text += "                      \n";
-    if (ImGui::Button(fire_text.c_str())) {
-        std::cout << "fired\n";
-        globals::fired = true;
-        globals::last_rx = std::chrono::high_resolution_clock::now();
-        globals::loggers.push_back(logger("sequence_log", globals::sequence_max_time));
+    if (globals::fired && globals::sequence_time > globals::sequence_max_time) {
+        globals::fired = false;
+        globals::sequence_time = 0;
     }
-    if (globals::sequence_control_safety) ImGui::EndDisabled();
+
+    ImVec2 large_button_size(ImGui::GetWindowSize().x / 4.3, ImGui::GetWindowSize().x / 10);
+    ImGui::PushFont(globals::font_deja_vu, 20.0f);
+    bool large_button_disabled = globals::sequence_control_safety || globals::fired;
+    if (large_button_disabled) ImGui::BeginDisabled();
+    {
+        if (ImGui::Button("FIRE", large_button_size)) {
+            std::cout << "fired\n";
+            globals::fired = true;
+            globals::loggers.push_back(logger("sequence_log", globals::sequence_max_time));
+        }
+        ImGui::SameLine();
+    }
+
+    {
+        if (ImGui::Button("ABORT", large_button_size)) {
+            std::cout << "aborted\n";
+            globals::fired = false;
+            globals::sequence_time = 0;
+        }
+        ImGui::SameLine();
+    }
+
+    {
+        if (ImGui::Button("PURGE", large_button_size)) {
+            std::cout << "purged\n";
+            globals::fired = false;
+            globals::sequence_time = 0;
+        }
+    }
+    if (large_button_disabled) ImGui::EndDisabled();
+    ImGui::PopFont();
+
+
+    if (globals::fired) ImGui::BeginDisabled();
     {
         float sequence_max_time_ = globals::sequence_max_time;
         ImGui::SetNextItemWidth(ImGui::CalcTextSize(" 120.0 s ").x);
         ImGui::DragFloat("Sequence Time Limit", &sequence_max_time_, 0.1f, 2.0f, 120.0f, "%.1f s");
         globals::sequence_max_time = sequence_max_time_;
     }
+    if (globals::fired) ImGui::EndDisabled();
+
 
     ImGui::SeparatorText("Loggers");
 

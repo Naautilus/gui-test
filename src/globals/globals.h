@@ -23,6 +23,7 @@ extern bool sequence_control_safety;
 extern bool fired;
 extern double sequence_time;
 extern double sequence_max_time;
+extern std::string console_text;
 extern image rocket;
 extern data_channel<valve> valves;
 extern data_history history_temperature;

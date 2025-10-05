@@ -15,6 +15,8 @@ bool sequence_control_safety = true;
 bool fired = false;
 double sequence_time = 0.0;
 double sequence_max_time = 30.0;
+std::string console_text = "";
+
 image rocket;
 
 namespace {
