@@ -15,6 +15,8 @@ extern ImFont* font_arial;
 extern ImFont* font_deja_vu;
 extern ImFont* font_noto_sans;
 
+extern bool power;
+extern bool power_safety;
 extern std::mutex globals_mutex;
 extern bool enable_tx;
 extern bool enable_rx;

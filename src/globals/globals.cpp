@@ -7,6 +7,8 @@ ImFont* font_arial;
 ImFont* font_deja_vu;
 ImFont* font_noto_sans;
 
+bool power = true;
+bool power_safety = true;
 bool enable_tx = true;
 bool enable_rx = true;
 std::optional<std::chrono::high_resolution_clock::time_point> last_rx = std::nullopt;
@@ -32,11 +34,11 @@ namespace {
 }
 
 data_channel<valve> valves({
-    valve(valve_names[0], 1.0, 2.0, std::make_optional(false)), 
-    valve(valve_names[1], 1.0, 2.0, std::make_optional(false)), 
-    valve(valve_names[2], 1.0, 2.0, std::make_optional(false)), 
-    valve(valve_names[3], 1.0, 10.0), 
-    valve(valve_names[4], 1.0, 10.0), 
+    valve(valve_names[0], 1.0, 2.0, std::make_optional(false)),
+    valve(valve_names[1], 1.0, 2.0, std::make_optional(false)),
+    valve(valve_names[2], 1.0, 2.0, std::make_optional(false)),
+    valve(valve_names[3], 1.0, 10.0),
+    valve(valve_names[4], 2.5, 10.0),
     valve(valve_names[5], 1.0, 2.0, std::make_optional(true)),
     valve(valve_names[6], 3.0, 4.0)
 });
