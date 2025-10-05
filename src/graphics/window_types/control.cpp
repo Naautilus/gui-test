@@ -34,34 +34,38 @@ void renderer::control_window() {
 
     ImVec2 large_button_size(ImGui::GetWindowSize().x / 4.3, ImGui::GetWindowSize().x / 10);
     ImGui::PushFont(globals::font_deja_vu, 20.0f);
-    bool large_button_disabled = globals::sequence_control_safety || globals::fired;
-    if (large_button_disabled) ImGui::BeginDisabled();
     {
+        bool disabled = globals::sequence_control_safety || globals::fired;
+        if (disabled) ImGui::BeginDisabled();
         if (ImGui::Button("FIRE", large_button_size)) {
             std::cout << "fired\n";
             globals::fired = true;
             globals::loggers.push_back(logger("sequence_log", globals::sequence_max_time));
         }
         ImGui::SameLine();
+        if (disabled) ImGui::EndDisabled();
     }
-
     {
+        bool disabled = globals::sequence_control_safety || !globals::fired;
+        if (disabled) ImGui::BeginDisabled();
         if (ImGui::Button("ABORT", large_button_size)) {
             std::cout << "aborted\n";
             globals::fired = false;
             globals::sequence_time = 0;
         }
         ImGui::SameLine();
+        if (disabled) ImGui::EndDisabled();
     }
-
     {
+        bool disabled = globals::sequence_control_safety || globals::fired;
+        if (disabled) ImGui::BeginDisabled();
         if (ImGui::Button("PURGE", large_button_size)) {
             std::cout << "purged\n";
             globals::fired = false;
             globals::sequence_time = 0;
         }
+        if (disabled) ImGui::EndDisabled();
     }
-    if (large_button_disabled) ImGui::EndDisabled();
     ImGui::PopFont();
 
 
