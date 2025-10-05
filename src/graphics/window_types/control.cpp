@@ -52,12 +52,12 @@ void renderer::control_window() {
     for (logger& l : globals::loggers) bitrate_sum += l.get_bitrate();
     bitrate_sum /= 1e6;
 
-    ImGui::PushFont(globals::font_arial);
+    ImGui::PushFont(globals::font_arial, 11.0);
     ImGui::Text("↓");
     ImGui::PopFont();
-
     ImGui::SameLine();
-    ImGui::Text("%.1f mbps", (float)bitrate_sum);
+    ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x - ImGui::CalcTextSize(" ").x * 0.5, ImGui::GetCursorPos().y));
+    ImGui::Text("%.1f Mbps", (float)bitrate_sum);
 
     if (ImGui::Button("+")) {
         globals::loggers.push_back(logger("manual_log"));
@@ -79,6 +79,13 @@ void renderer::control_window() {
             ImGui::Text(duration_text.c_str());
             ImGui::SameLine();
         }
+        ImGui::PushFont(globals::font_arial, 11.0);
+        ImGui::Text("↓");
+        ImGui::PopFont();
+        ImGui::SameLine();
+        ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x - ImGui::CalcTextSize(" ").x * 0.5, ImGui::GetCursorPos().y));
+        ImGui::Text("%.1f mbps", (float)(l.get_bitrate() / 1e6));
+        ImGui::SameLine();
         {
             std::string button_text = "Stop##" + std::to_string(i);
             if (ImGui::Button(button_text.c_str())) {
