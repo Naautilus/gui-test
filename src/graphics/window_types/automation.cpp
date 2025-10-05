@@ -23,14 +23,14 @@ void renderer::automation_window() {
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize
                                   | ImGuiWindowFlags_NoMove;
 
-    ImGui::Begin("Automation", nullptr);
+    ImGui::Begin("Automation", nullptr, window_flags);
 
     ImGui::SeparatorText("Valve Timings");
     std::vector<valve> valves_ = globals::valves.get_data();
     for (valve& v : valves_) {
         float open_time = (float)v.open_time;
         float close_time = (float)v.close_time;
-        ImGui::DragFloatRange2(v.get_name().c_str(), &open_time, &close_time, 0.01f, -1.0f, 30.0f, "Open: T + %.3f s", "Close: T + %.3f s", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragFloatRange2(v.get_name().c_str(), &open_time, &close_time, 0.01f, -1.0f, 1000.0f, "Open: T + %.3f s", "Close: T + %.3f s", ImGuiSliderFlags_AlwaysClamp);
         v.open_time = (double)open_time;
         v.close_time = (double)close_time;
     }
@@ -48,7 +48,8 @@ void renderer::automation_window() {
 
     if (!manual_activation) ImGui::BeginDisabled();
     for (valve& v : valves_) {
-        bool activated = v.is_open(globals::sequence_time);
+        bool activated = activated = v.is_open(globals::sequence_time);
+        if (globals::sequence_time > globals::sequence_max_time) activated = false;
         ImGui::Checkbox(v.get_name().c_str(), &activated);
         if (manual_activation) v.set_to_manual_activation(activated);
         else v.set_to_automatic_activation(); // this isn't necessary to run each frame, but might as well

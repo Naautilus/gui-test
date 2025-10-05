@@ -2,12 +2,19 @@
 
 namespace globals {
 
+ImFont* font_default;
+ImFont* font_arial;
+ImFont* font_deja_vu;
+ImFont* font_noto_sans;
+
 bool enable_tx = true;
 bool enable_rx = true;
 std::optional<std::chrono::high_resolution_clock::time_point> last_rx = std::nullopt;
 
+bool sequence_control_safety = true;
 bool fired = false;
-double sequence_time = 0;
+double sequence_time = 0.0;
+double sequence_max_time = 30.0;
 image rocket;
 
 namespace {

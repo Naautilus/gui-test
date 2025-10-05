@@ -18,7 +18,11 @@ void renderer::communications_window() {
     std::lock_guard<std::mutex> lock(globals::globals_mutex);
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.385, y_size * 0.005));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.61, y_size * 0.37));
-    ImGui::Begin("Communications", nullptr);
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize
+                                  | ImGuiWindowFlags_NoMove;
+
+    ImGui::Begin("Communications", nullptr, window_flags);
     ImGui::Checkbox("TX", &globals::enable_tx);
     ImGui::Checkbox("RX", &globals::enable_rx);
 

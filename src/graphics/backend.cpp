@@ -1,4 +1,5 @@
 #include "backend.h"
+#include "../globals/globals.h"
 #include <iostream>
 #include "renderer.h"
 #include "imgui.h"
@@ -62,7 +63,25 @@ backend::backend(double& content_scale, int& x_size, int& y_size) {
     ImGuiStyle& style = ImGui::GetStyle();
     style.ScaleAllSizes(content_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
     style.FontScaleDpi = content_scale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
+
+
+    ImFontGlyphRangesBuilder builder;
+    builder.AddChar(0x2191); // ↑
+    builder.AddChar(0x2193); // ↓
+    builder.AddChar(0xa688); // Ꚉ
+    builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
     
+    ImVector<ImWchar> ranges;
+    builder.BuildRanges(&ranges);
+    
+    globals::globals_mutex.lock();
+    globals::font_default = io.Fonts->AddFontDefault();
+    globals::font_arial = io.Fonts->AddFontFromFileTTF("../src/graphics/fonts/arial.ttf", 13.0f, nullptr, ranges.Data);
+    globals::font_deja_vu = io.Fonts->AddFontFromFileTTF("../src/graphics/fonts/DejaVuSansMono.ttf", 13.0f, nullptr, ranges.Data);
+    globals::font_noto_sans = io.Fonts->AddFontFromFileTTF("../src/graphics/fonts/NotoSans-Regular.ttf", 13.0f, nullptr, ranges.Data);
+    globals::globals_mutex.unlock();
+    
+
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);

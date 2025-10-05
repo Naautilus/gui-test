@@ -53,6 +53,8 @@ renderer::renderer() {
     {   
         if (!backend_.start_of_frame()) continue;
 
+        ImGui::PushFont(globals::font_deja_vu);
+
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
 
@@ -68,6 +70,8 @@ renderer::renderer() {
         graph_window("Thrust (stones)", globals::history_thrust, 0.0, 10.0, colormap_green, ImVec2(x_size * 0.635, y_size * 0.825), ImVec2(x_size * 0.35, y_size * 0.08));
         graph_window("Vibration (ft/min^2)", globals::history_vibration, 0.0, 100.0, colormap_pink, ImVec2(x_size * 0.635, y_size * 0.905), ImVec2(x_size * 0.35, y_size * 0.08));
         
+        ImGui::PopFont();
+
         backend_.end_of_frame();
     }
     backend_.end();

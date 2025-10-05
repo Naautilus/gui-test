@@ -1,5 +1,6 @@
 #include "logger.h"
 #include "../globals/globals.h"
+#include <iostream>
 #include <ctime>
 
 logger::logger(std::string name, double duration_) {
@@ -40,6 +41,8 @@ void write_data_history(std::ofstream& file, bool title, data_history& data_hist
 
 void logger::write(bool title) {
 
+    calculate_bitrate();
+
     if (duration && time_since_creation() > duration.value()) return;
 
     file << (title ? "logger_time"   : std::to_string(time_since_creation())) << "\t";
@@ -63,4 +66,22 @@ double logger::time_since_creation() {
 
 std::string logger::get_filename() {
     return filename;
+}
+
+void logger::calculate_bitrate() {
+
+    double time_difference = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - last_bitrate_calculate_time).count();
+    if (time_difference < std::chrono::duration<double>(bitrate_calculate_interval).count()) return;
+    last_bitrate_calculate_time = std::chrono::high_resolution_clock::now();
+
+    std::streamoff current_file_size = file.tellp();
+    auto file_size_difference = current_file_size - last_file_size;
+    last_file_size = current_file_size;
+
+    bits_per_second = 8 * file_size_difference / time_difference;
+
+}
+
+double logger::get_bitrate() {
+    return bits_per_second;
 }

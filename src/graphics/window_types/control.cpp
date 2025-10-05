@@ -18,8 +18,14 @@ void renderer::control_window() {
     std::lock_guard<std::mutex> lock(globals::globals_mutex);
     ImGui::SetNextWindowPos(ImVec2(x_size * 0.005, y_size * 0.005));
     ImGui::SetNextWindowSize(ImVec2(x_size * 0.37, y_size * 0.37));
-    ImGui::Begin("Control", nullptr);
+    
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize
+                                  | ImGuiWindowFlags_NoMove;
+
+    ImGui::Begin("Control", nullptr, window_flags);
     ImGui::SeparatorText("Sequence Control");
+    ImGui::Checkbox("Safety", &globals::sequence_control_safety);
+    if (globals::sequence_control_safety) ImGui::BeginDisabled();
     std::string fire_text;
     fire_text += "                      \n";
     fire_text += "      ----------      \n";
@@ -30,9 +36,29 @@ void renderer::control_window() {
         std::cout << "fired\n";
         globals::fired = true;
         globals::last_rx = std::chrono::high_resolution_clock::now();
-        globals::loggers.push_back(logger("sequence_log", 30.0));
+        globals::loggers.push_back(logger("sequence_log", globals::sequence_max_time));
     }
+    if (globals::sequence_control_safety) ImGui::EndDisabled();
+    {
+        float sequence_max_time_ = globals::sequence_max_time;
+        ImGui::SetNextItemWidth(ImGui::CalcTextSize(" 120.0 s ").x);
+        ImGui::DragFloat("Sequence Time Limit", &sequence_max_time_, 0.1f, 0.0f, 120.0f, "%.1f s");
+        globals::sequence_max_time = sequence_max_time_;
+    }
+
     ImGui::SeparatorText("Loggers");
+
+    double bitrate_sum;
+    for (logger& l : globals::loggers) bitrate_sum += l.get_bitrate();
+    bitrate_sum /= 1e6;
+
+    ImGui::PushFont(globals::font_arial);
+    ImGui::Text("↓");
+    ImGui::PopFont();
+
+    ImGui::SameLine();
+    ImGui::Text("%.1f mbps", (float)bitrate_sum);
+
     if (ImGui::Button("+")) {
         globals::loggers.push_back(logger("manual_log"));
     }

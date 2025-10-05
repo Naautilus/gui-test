@@ -63,7 +63,9 @@
         "thread": "cpp",
         "mutex": "cpp",
         "condition_variable": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "codecvt": "cpp",
+        "filesystem": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
