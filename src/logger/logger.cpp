@@ -9,8 +9,8 @@ logger::logger(logger_type logger_type__, std::optional<double> duration_) {
 
     time_t now;
     time(&now);
-    char timestamp[sizeof("_YYYY-MM-DD_HH-MM-SS")];
-    strftime(timestamp, sizeof(timestamp), "_%Y-%m-%d_%H-%M-%S", localtime(&now));
+    char timestamp[sizeof("YYYY-MM-DD_HH-MM-SS")];
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d_%H-%M-%S", localtime(&now));
 
     filename = get_name_for_logger_type();
     filename += "_log_";
