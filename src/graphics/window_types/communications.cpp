@@ -77,26 +77,18 @@ void renderer::communications_window() {
 
     ImVec2 console_size(x_size * 0.3, y_size * 0.32);
 
-    static int tick;
-    static std::string random_;
-    if (globals::enable_tx && globals::enable_rx && tick % 30 == 0) {
-        random_ = "";
-        for (int i = 0; i < 10; i++) random_ += std::to_string(rand() % 10);
-        globals::console_text += "↑heartbeat " + random_ + "\n";
+    globals::console_text += globals::serial_communications;
+    globals::serial_communications = "";
+
+    int CONSOLE_TEXT_SIZE_HARD_LIMIT = 10000;
+
+    if (globals::console_text.size() > CONSOLE_TEXT_SIZE_HARD_LIMIT) {
+        globals::console_text = globals::console_text.substr(globals::console_text.size() - CONSOLE_TEXT_SIZE_HARD_LIMIT);
     }
-    if (globals::enable_tx && globals::enable_rx && tick % 30 == 5) {
-        globals::console_text += "↓heartbeat " + random_ + "\n";
-        globals::last_rx = std::chrono::high_resolution_clock::now();
-    }
-    tick++;
 
     while (ImGui::CalcTextSize(globals::console_text.c_str()).y > (console_size.y - content_scale)) {
         globals::console_text = globals::console_text.substr(1);
     }
-    //char buf[8192];
-    //strncpy(buf, globals::console_text.c_str(), sizeof(buf));
-    //buf[sizeof(buf) - 1] = '\0';
-    //ImGui::InputTextMultiline("", buf, sizeof(buf), console_size, ImGuiInputTextFlags_);
 
     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
     ImGui::BeginChild("##Console", console_size, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);

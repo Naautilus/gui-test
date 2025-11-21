@@ -34,6 +34,8 @@ extern data_history history_thrust;
 extern data_history history_vibration;
 extern data_history history_valves;
 extern std::vector<logger> loggers;
+extern std::string serial_communications;
+extern std::string serial_communications_state;
 
 void initialize_images();
 

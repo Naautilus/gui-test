@@ -50,6 +50,8 @@ data_history history_vibration(3000, 1, data_channel<std::string>({""}));
 data_history history_valves(3000, valves.get_data().size(), data_channel<std::string>(valve_names));
 std::mutex globals_mutex;
 std::vector<logger> loggers;
+std::string serial_communications = "";
+std::string serial_communications_state = "...";
 
 void initialize_images() {
     rocket = image("../images/rocket.png");

@@ -1,11 +1,15 @@
 #include <thread>
-#include "math.h"
+#include <math.h>
+#include <iostream>
 #include "graphics/renderer.h"
 #include "globals/globals.h"
 #include "systems/simulated_data.h"
-#include "asio.hpp"
+#include "io/serial_interface.h"
 
 int main() {
+
+    serial_interface serial_interface_;
+
     const double DELTA_T = 0.001;
 
     globals::globals_mutex.lock();
@@ -31,6 +35,10 @@ int main() {
         globals::globals_mutex.lock();
         for (logger& l : globals::loggers) l.write();
         globals::globals_mutex.unlock();
+
+        serial_interface_.read();
+        serial_interface_.write(std::to_string(tick));
+        serial_interface_.write("...");
 
         if (tick > 3000) while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
     }

@@ -17,7 +17,7 @@ static void glfw_error_callback(int error, const char* description) {
 
 namespace graphics {
 
-backend::backend(double& content_scale, int& x_size, int& y_size) {
+backend::backend(double& content_scale, int& x_size, int& y_size, bool fullscreen) {
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit()) {
         std::cerr << "GLFW failed to initialize\n";
@@ -37,7 +37,7 @@ backend::backend(double& content_scale, int& x_size, int& y_size) {
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-    window = glfwCreateWindow(mode->width, mode->height, "Dear ImGui GLFW+OpenGL3 example", glfwGetPrimaryMonitor(), nullptr);
+    window = glfwCreateWindow(mode->width, mode->height, "Dear ImGui GLFW+OpenGL3 example", (fullscreen ? glfwGetPrimaryMonitor() : nullptr), nullptr);
 
     glfwGetWindowSize(window, &x_size, &y_size);
 

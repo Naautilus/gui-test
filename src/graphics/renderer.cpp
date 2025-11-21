@@ -25,7 +25,7 @@ int y_size;
 
 renderer::renderer() {
 
-    backend backend_(content_scale, x_size, y_size);
+    backend backend_(content_scale, x_size, y_size, false);
     
     // Our state
     globals::initialize_images();

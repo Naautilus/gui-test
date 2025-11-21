@@ -17,6 +17,7 @@ class renderer {
     void automation_window();
     void communications_window();
     public:
+    void add_text_to_communications_window(bool write, std::string text); // bool write = true if writing to teensy, false if reading from teensy
     renderer();
 };
 
