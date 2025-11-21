@@ -3,6 +3,7 @@
 #include "graphics/renderer.h"
 #include "globals/globals.h"
 #include "systems/simulated_data.h"
+#include "asio.hpp"
 
 int main() {
     const double DELTA_T = 0.001;

@@ -39,13 +39,26 @@ target_include_directories(implot PRIVATE
     external/imgui
 )
 
+add_library(asio
+    external/asio/include/asio.hpp
+)
+
+set_target_properties(asio PROPERTIES LINKER_LANGUAGE CXX)
+
+target_include_directories(asio PRIVATE
+    external/asio/include
+)
+
+target_link_libraries(asio PRIVATE ws2_32)
+
 # Create the executable
 add_executable(main ${SRC_FILES})
-target_link_libraries(main PRIVATE imgui glfw3 opengl32 m implot)
+target_link_libraries(main PRIVATE imgui glfw3 opengl32 m implot asio)
 
 # Include ImGui headers
 target_include_directories(main PRIVATE
     external/imgui
     external/imgui/backends
     external/implot
+    external/asio/include
 )
