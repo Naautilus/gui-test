@@ -43,7 +43,8 @@ void serial_interface::find_port() {
     globals::globals_mutex.lock();
     globals::serial_communications_state = "Selecting serial port " + port_name + ".\n";
     globals::globals_mutex.unlock();
-    port->open(port_name);
+    asio::error_code ec;
+    port->open(port_name, ec);
 }
 
 serial_interface::serial_interface() {}
@@ -52,9 +53,7 @@ void serial_interface::write(std::string data) {
     if (!port) find_port();
     if (!port) return;
     globals::globals_mutex.lock();
-    globals::serial_communications += "↑ ";
-    globals::serial_communications += data;
-    globals::serial_communications += "\n";
+    globals::console_tx_text += "↑ " + data + "\n";
     globals::globals_mutex.unlock();
     asio::error_code ec;
     asio::write(*port, asio::buffer(data), ec);
@@ -67,7 +66,7 @@ void serial_interface::write(std::string data) {
 std::string serial_interface::read() {
     if (!port) find_port();
     if (!port) return "";
-    const size_t max_bytes = 1024;
+    const size_t max_bytes = 1000000;
     std::vector<char> buffer(max_bytes);
     asio::error_code ec;
     size_t length = port->read_some(asio::buffer(buffer), ec);
@@ -76,10 +75,10 @@ std::string serial_interface::read() {
         find_port();
     }
     std::string data = std::string(buffer.data(), length);
-    globals::globals_mutex.lock();
-    globals::serial_communications += "↓ ";
-    globals::serial_communications += data;
-    globals::serial_communications += "\n";
-    globals::globals_mutex.unlock();
+    if (data != "") {
+        globals::globals_mutex.lock();
+        globals::console_rx_text += "↓ " + data + "\n";
+        globals::globals_mutex.unlock();
+    }
     return data;
 }

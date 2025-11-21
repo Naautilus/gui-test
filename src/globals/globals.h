@@ -25,7 +25,8 @@ extern bool sequence_control_safety;
 extern bool fired;
 extern double sequence_time;
 extern double sequence_max_time;
-extern std::string console_text;
+extern std::string console_tx_text;
+extern std::string console_rx_text;
 extern image rocket;
 extern data_channel<valve> valves;
 extern data_history history_temperature;
@@ -34,7 +35,6 @@ extern data_history history_thrust;
 extern data_history history_vibration;
 extern data_history history_valves;
 extern std::vector<logger> loggers;
-extern std::string serial_communications;
 extern std::string serial_communications_state;
 
 void initialize_images();

@@ -17,7 +17,8 @@ bool sequence_control_safety = true;
 bool fired = false;
 double sequence_time = 0.0;
 double sequence_max_time = 30.0;
-std::string console_text = "";
+std::string console_tx_text = "";
+std::string console_rx_text = "";
 
 image rocket;
 
@@ -50,7 +51,6 @@ data_history history_vibration(3000, 1, data_channel<std::string>({""}));
 data_history history_valves(3000, valves.get_data().size(), data_channel<std::string>(valve_names));
 std::mutex globals_mutex;
 std::vector<logger> loggers;
-std::string serial_communications = "";
 std::string serial_communications_state = "...";
 
 void initialize_images() {

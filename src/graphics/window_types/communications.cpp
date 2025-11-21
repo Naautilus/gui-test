@@ -66,28 +66,43 @@ void renderer::communications_window() {
     ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPos().x - ImGui::CalcTextSize(" ").x * 0.5, ImGui::GetCursorPos().y));
     ImGui::Text("%.1f Mbps", 0.0);
 
-    ImGui::SetCursorPos(ImVec2(x_size * 0.3, y_size * 0.035));
-
-    ImVec2 console_size(x_size * 0.3, y_size * 0.32);
-
-    globals::console_text += globals::serial_communications;
-    globals::serial_communications = "";
+    ImVec2 console_tx_size(x_size * 0.15, y_size * 0.32);
+    ImVec2 console_rx_size(x_size * 0.15, y_size * 0.32);
 
     int CONSOLE_TEXT_SIZE_HARD_LIMIT = 10000;
 
-    if (globals::console_text.size() > CONSOLE_TEXT_SIZE_HARD_LIMIT) {
-        globals::console_text = globals::console_text.substr(globals::console_text.size() - CONSOLE_TEXT_SIZE_HARD_LIMIT);
+    if (globals::console_tx_text.size() > CONSOLE_TEXT_SIZE_HARD_LIMIT) {
+        globals::console_tx_text = globals::console_tx_text.substr(globals::console_tx_text.size() - CONSOLE_TEXT_SIZE_HARD_LIMIT);
+    }
+    if (globals::console_rx_text.size() > CONSOLE_TEXT_SIZE_HARD_LIMIT) {
+        globals::console_rx_text = globals::console_rx_text.substr(globals::console_rx_text.size() - CONSOLE_TEXT_SIZE_HARD_LIMIT);
     }
 
-    while (ImGui::CalcTextSize(globals::console_text.c_str()).y > (console_size.y - content_scale)) {
-        globals::console_text = globals::console_text.substr(1);
+    while (ImGui::CalcTextSize(globals::console_tx_text.c_str()).y > (console_tx_size.y - content_scale)) {
+        globals::console_tx_text = globals::console_tx_text.substr(1);
+    }
+    while (ImGui::CalcTextSize(globals::console_rx_text.c_str()).y > (console_rx_size.y - content_scale)) {
+        globals::console_rx_text = globals::console_rx_text.substr(1);
     }
 
+    ImGui::SetCursorPos(ImVec2(x_size * 0.3, y_size * 0.035));
     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-    ImGui::BeginChild("##Console", console_size, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-    ImGui::Text(globals::console_text.c_str());
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 1.0f, 0.9f, 1.0f));
+    ImGui::BeginChild("##Console_TX", console_tx_size, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ImGui::Text(globals::console_tx_text.c_str());
     ImGui::EndChild();
     ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+
+    ImGui::SetCursorPos(ImVec2(x_size * 0.45, y_size * 0.035));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.9f, 1.0f, 1.0f));
+    ImGui::BeginChild("##Console_RX", console_rx_size, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ImGui::Text(globals::console_rx_text.c_str());
+    ImGui::EndChild();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+
 
     ImGui::End();
 }

@@ -37,8 +37,7 @@ int main() {
         globals::globals_mutex.unlock();
 
         serial_interface_.read();
-        serial_interface_.write(std::to_string(tick));
-        serial_interface_.write("...");
+        serial_interface_.write(std::to_string(tick) + "...");
 
         if (tick > 3000) while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
     }
