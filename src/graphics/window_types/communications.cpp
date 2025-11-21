@@ -34,14 +34,7 @@ void renderer::communications_window() {
 
     ImGui::Text("Connection:");
     ImGui::SameLine();
-    {
-        std::string status;
-        if (!globals::enable_rx) status = "Disabled";
-        else if (!globals::last_rx) status = "Waiting for RX...";
-        else if (good_rx_time) status = "OK";
-        else status = "No RX";
-        ImGui::Text(status.c_str());
-    }
+    ImGui::Text(globals::serial_communications_state.c_str());
     ImGui::PopFont();
 
     ImGui::Text("");

@@ -22,21 +22,27 @@ void serial_interface::find_port() {
     }
 
     if (successful_ports.size() == 0) {
-        std::cout << "serial_interface: No open serial ports found. Not opening port.\n";
+        globals::globals_mutex.lock();
+        globals::serial_communications_state = "No open serial ports found. Not opening port.\n";
+        globals::globals_mutex.unlock();
         return;
     }
 
-    std::cout << "serial_interface: open serial ports found:\n";
-    for (std::string port_name : successful_ports) std::cout << port_name << "\n";
+    //std::cout << "open serial ports found:\n";
+    //for (std::string port_name : successful_ports) std::cout << port_name << "\n";
     
     if (successful_ports.size() != 1) {
-        std::cout << "serial_interface: Multiple open serial ports found. Not opening port.\n";
+        globals::globals_mutex.lock();
+        globals::serial_communications_state = "Multiple open serial ports found. Not opening port.\n";
+        globals::globals_mutex.unlock();
         return;
     }
 
     port = std::make_unique<asio::serial_port>(asio::serial_port(io));
     std::string port_name = successful_ports[0];
-    std::cout << "serial_interface: Selecting serial port " << port_name << ".\n";
+    globals::globals_mutex.lock();
+    globals::serial_communications_state = "Selecting serial port " + port_name + ".\n";
+    globals::globals_mutex.unlock();
     port->open(port_name);
 }
 
@@ -45,13 +51,15 @@ serial_interface::serial_interface() {}
 void serial_interface::write(std::string data) {
     if (!port) find_port();
     if (!port) return;
+    globals::globals_mutex.lock();
     globals::serial_communications += "↑ ";
     globals::serial_communications += data;
     globals::serial_communications += "\n";
+    globals::globals_mutex.unlock();
     asio::error_code ec;
     asio::write(*port, asio::buffer(data), ec);
     if (ec) {
-        std::cout << "serial_interface: write error: " << ec.message() << "(" << ec.value() << ")\n";
+        //std::cout << "serial_interface: write error: " << ec.message() << "(" << ec.value() << ")\n";
         find_port();
     }
 }
@@ -64,12 +72,14 @@ std::string serial_interface::read() {
     asio::error_code ec;
     size_t length = port->read_some(asio::buffer(buffer), ec);
     if (ec) {
-        std::cout << "serial_interface: read error: " << ec.message() << "(" << ec.value() << ")\n";
+        //std::cout << "serial_interface: read error: " << ec.message() << "(" << ec.value() << ")\n";
         find_port();
     }
     std::string data = std::string(buffer.data(), length);
+    globals::globals_mutex.lock();
     globals::serial_communications += "↓ ";
     globals::serial_communications += data;
     globals::serial_communications += "\n";
+    globals::globals_mutex.unlock();
     return data;
 }
