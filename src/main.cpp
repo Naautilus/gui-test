@@ -22,6 +22,9 @@ int main() {
 
     srand(time(NULL));
     simulated_data simulated_data_;
+    
+    auto test_string = std::make_shared<std::string>("");
+    serial_interface_.start_read_loop(test_string);
 
     for (int tick = 0; true; tick++) {
         auto time_start = std::chrono::high_resolution_clock::now();
@@ -36,8 +39,7 @@ int main() {
         for (logger& l : globals::loggers) l.write();
         globals::globals_mutex.unlock();
 
-        serial_interface_.read();
-        serial_interface_.write(std::to_string(tick) + "...");
+        serial_interface_.write(std::to_string(tick) + "...\n");
 
         if (tick > 3000) while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
     }

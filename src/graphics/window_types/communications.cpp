@@ -37,6 +37,7 @@ void renderer::communications_window() {
     ImGui::Text(globals::serial_communications_state.c_str());
     ImGui::PopFont();
 
+    ImGui::Text("");
     ImGui::Text("Time since last RX:");
     ImGui::SameLine();
     {
@@ -68,7 +69,7 @@ void renderer::communications_window() {
     ImVec2 console_tx_size(x_size * 0.15, y_size * 0.32);
     ImVec2 console_rx_size(x_size * 0.15, y_size * 0.32);
 
-    int CONSOLE_TEXT_SIZE_HARD_LIMIT = 10000;
+    int CONSOLE_TEXT_SIZE_HARD_LIMIT = 100000;
 
     if (globals::console_tx_text.size() > CONSOLE_TEXT_SIZE_HARD_LIMIT) {
         globals::console_tx_text = globals::console_tx_text.substr(globals::console_tx_text.size() - CONSOLE_TEXT_SIZE_HARD_LIMIT);
@@ -82,6 +83,17 @@ void renderer::communications_window() {
     }
     while (ImGui::CalcTextSize(globals::console_rx_text.c_str()).y > (console_rx_size.y - content_scale)) {
         globals::console_rx_text = globals::console_rx_text.substr(1);
+    }
+
+    for (int i = globals::console_tx_text.size() - 1; i >= 0; i--) {
+        if (i >= globals::console_tx_text.size() || globals::console_tx_text[i] != '\n') continue;
+        if (globals::console_tx_text.substr(i+1, 3) == "↑") continue;
+        globals::console_tx_text.insert(i+1, "↑ ");
+    }
+    for (int i = globals::console_rx_text.size() - 1; i >= 0; i--) {
+        if (i >= globals::console_rx_text.size() || globals::console_rx_text[i] != '\n') continue;
+        if (globals::console_rx_text.substr(i+1, 3) == "↓") continue;
+        globals::console_rx_text.insert(i+1, "↓ ");
     }
 
     ImGui::SetCursorPos(ImVec2(x_size * 0.3, y_size * 0.035));

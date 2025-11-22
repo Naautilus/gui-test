@@ -12,9 +12,10 @@ If there are multiple ports open, it will abort the program.
 class serial_interface {
     asio::io_context io;
     std::unique_ptr<asio::serial_port> port;
-    void find_port();
+    asio::executor_work_guard<asio::io_context::executor_type> work_guard;
     public:
+    void find_port();
     serial_interface();
     void write(std::string data);
-    void read(/*std::shared_ptr<std::string> write_destination*/);
-}
+    void start_read_loop(std::shared_ptr<std::string> location);
+};
