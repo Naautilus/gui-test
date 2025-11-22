@@ -16,5 +16,5 @@ class serial_interface {
     public:
     serial_interface();
     void write(std::string data);
-    std::string read();
-};
+    void read(/*std::shared_ptr<std::string> write_destination*/);
+}

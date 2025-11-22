@@ -37,7 +37,6 @@ void renderer::communications_window() {
     ImGui::Text(globals::serial_communications_state.c_str());
     ImGui::PopFont();
 
-    ImGui::Text("");
     ImGui::Text("Time since last RX:");
     ImGui::SameLine();
     {
