@@ -22,13 +22,26 @@ void serial_interface::find_port() {
         }
     }
 
+    static int no_ports_found_in_a_row = 0;
     if (successful_ports.size() == 0) {
+        no_ports_found_in_a_row++;
+
+        /*
+        with asynchronous serial, this can sometimes be called a few times
+        after another thread finds a working serial port, making the status
+        inaccurate - i use this workaround solution to make it not error
+        */
+
+        std::cout << "no_ports_found_in_a_row: " << no_ports_found_in_a_row << "\n";
+        if (no_ports_found_in_a_row < 2000) return;
+
         globals::globals_mutex.lock();
         globals::serial_communications_state = "No open serial ports found\n\n";
-        std::cout << ".";
         globals::globals_mutex.unlock();
+        
         return;
     }
+    no_ports_found_in_a_row = 0;
 
     if (successful_ports.size() != 1) {
         globals::globals_mutex.lock();
@@ -87,6 +100,7 @@ void serial_interface::start_read_loop(std::shared_ptr<std::string> location) {
             if (data != "") {
                 if (location) *location += data;
                 globals::globals_mutex.lock();
+                globals::last_rx = std::make_optional(std::chrono::high_resolution_clock::now());
                 globals::console_rx_text += data;
                 globals::globals_mutex.unlock();
             }
