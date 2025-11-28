@@ -1,6 +1,6 @@
+#include <iostream>
 #include "backend.h"
 #include "../globals/globals.h"
-#include <iostream>
 #include "renderer.h"
 #include "imgui.h"
 #include "implot.h"

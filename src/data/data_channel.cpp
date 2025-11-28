@@ -1,8 +1,8 @@
-#include "data_channel.h"
-#include "valve.h"
 #include <iostream>
 #include <cmath>
 #include <numeric>
+#include "data_channel.h"
+#include "valve.h"
 
 template <>
 double data_channel<double>::reset_value() {

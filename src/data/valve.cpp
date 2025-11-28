@@ -1,5 +1,5 @@
-#include "valve.h"
 #include <math.h>
+#include "valve.h"
 
 valve::valve() {}
 

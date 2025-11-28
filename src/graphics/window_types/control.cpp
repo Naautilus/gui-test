@@ -1,8 +1,8 @@
-#include "../renderer.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <math.h>
+#include "../renderer.h"
 #include "imgui.h"
 #include "implot.h"
 #include "backends/imgui_impl_glfw.h"

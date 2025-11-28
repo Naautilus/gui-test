@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define STB_IMAGE_IMPLEMENTATION
+#include <iostream>
 #include "stb_image.h"
 #include "image.h"
 #include "imgui.h"
@@ -7,7 +8,6 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "../../globals/globals.h"
 #include "../renderer.h"
-#include <iostream>
 
 // EXTERNAL CODE
 // Simple helper function to load an image into a OpenGL texture with common settings

@@ -1,6 +1,6 @@
 #pragma once
-#include <GLFW/glfw3.h>
 #include <string>
+#include "GLFW/glfw3.h"
 
 struct image {
     int width, height = 0;

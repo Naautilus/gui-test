@@ -1,12 +1,12 @@
 #pragma once
+#include <mutex>
+#include <chrono>
+#include <optional>
 #include "../graphics/image/image.h"
 #include "../data/data_history.h"
 #include "../data/valve.h"
 #include "../logger/logger.h"
 #include "imgui.h"
-#include <mutex>
-#include <chrono>
-#include <optional>
 
 namespace globals {
 

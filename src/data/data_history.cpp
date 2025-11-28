@@ -1,6 +1,6 @@
-#include "data_history.h"
 #include <iostream>
 #include <cmath>
+#include "data_history.h"
 
 void data_history::verify_data() {
     if (history.size() != length) {
