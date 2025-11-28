@@ -12,6 +12,7 @@ If there are multiple ports open, it will abort the program.
 class serial_interface {
     asio::io_context io;
     std::unique_ptr<asio::serial_port> port;
+    std::string port_name;
     asio::executor_work_guard<asio::io_context::executor_type> work_guard;
     public:
     void find_port();
