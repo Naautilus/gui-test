@@ -13,14 +13,22 @@
 |      - error codes, maybe
 */
 
+// comms standard is custom cuz thats what SRAD is about
+
+enum tx_type {
+    power_on,
+    power_off,
+    start_fire,
+    stop_fire,
+    purge
+};
+
 class io_manager {
     std::string rx_for_data;
     std::string rx_for_error_code;
+    encode_base64();
+    decode_base64();
     public:
-    tx_power_on();
-    tx_power_off();
-    tx_start_fire();
-    tx_stop_fire();
-    tx_purge();
-    rx_interpret_data();
+    tx(tx_type tx_type_);
+    rx();
 };
