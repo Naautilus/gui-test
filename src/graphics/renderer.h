@@ -5,8 +5,13 @@
 
 namespace graphics {
 
+/*
+| renderer is a class which displays the GUI.
+| It is non-static in case you need several different GUI windows in the future.
+*/
+
 class renderer {
-    const double WINDOW_SIZE_BUFFER = 25;
+    const double WINDOW_SIZE_BUFFER = 25; // how many pixels to put around windows, since contents are automatically inset
     const double GRAPH_BORDER_WIDTH = 5;
     double content_scale;
     int x_size;

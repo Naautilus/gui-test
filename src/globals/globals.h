@@ -8,6 +8,13 @@
 #include "../logger/logger.h"
 #include "imgui.h"
 
+/*
+| globals is a namespace which contains all of the global variables in the project.
+| 
+| [!] When using a global variable, make sure to lock the globals_mutex.
+|     (globals is a shared resource between threads.)
+*/
+
 namespace globals {
 
 extern ImFont* font_default;

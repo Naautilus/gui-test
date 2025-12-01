@@ -11,6 +11,16 @@ enum logger_type {
     rx
 };
 
+/*
+| logger is a class which writes data to a file.
+| It tracks certain preset global variables as specified in write().
+| Different logger_types have no difference in what they write,
+|   and are distinct only so that multiple logs can start and stop at
+|   useful points.
+| (tx and rx are not implemented; they are intended to write different things,
+    i.e. log what is being tx'd and rx'd.)
+*/
+
 class logger {
 
     std::chrono::high_resolution_clock::duration bitrate_calculate_interval = std::chrono::milliseconds(100);

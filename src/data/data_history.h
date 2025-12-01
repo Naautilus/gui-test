@@ -2,6 +2,14 @@
 #include <string>
 #include "data_channel.h"
 
+/*
+| data_history is a class which records history of a data_channel.
+| It is effectively a wrapper class for a 2D array of values.
+| 
+| It can only track a data_channel<double> over time,
+| and has a data_channel<std::string> for labels.
+*/
+
 class data_history {
     int length; // how many historical datapoints to keep
     int width; // how many datapoints wide the data is

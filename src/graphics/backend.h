@@ -3,6 +3,11 @@
 
 namespace graphics {
 
+/*
+| backend is a class which hides the complicated
+| logic of initializing imgui and OpenGL.
+*/
+
 class backend {
     GLFWwindow* window;
     public:

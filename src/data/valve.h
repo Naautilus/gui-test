@@ -2,6 +2,12 @@
 #include <string>
 #include <optional>
 
+/*
+| valve is a class which manages a physical valve.
+| It controls when it opens and closes in the automated firing sequence,
+| as well as if it is being manually opened/closed.
+*/
+
 class valve {
     std::string name;
     std::optional<bool> manual_activation_state;

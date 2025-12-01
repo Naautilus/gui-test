@@ -1,6 +1,11 @@
 #pragma once
 #include <vector>
 
+/*
+| simulated_data creates fake simulation data for testing data logging.
+| Make sure to switch to the real data before launch. :)
+*/
+
 class simulated_data {
     std::vector<double> simulated_pressure;
     std::vector<double> simulated_temperature;

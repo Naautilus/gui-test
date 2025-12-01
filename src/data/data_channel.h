@@ -1,6 +1,11 @@
 #pragma once
 #include <vector>
 
+/*
+| data_channel is a class which manages a 1D list of values over time.
+| It can hold a std::string, double, or valve state.
+*/
+
 template <typename T>
 class data_channel {
     size_t width;
