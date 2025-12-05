@@ -5,6 +5,7 @@
 #include "globals/globals.h"
 #include "systems/simulated_data.h"
 #include "io/serial_interface.h"
+#include "io/io_manager.h"
 
 int main() {
 
@@ -40,6 +41,12 @@ int main() {
         globals::globals_mutex.unlock();
 
         serial_interface_.write(std::to_string(tick) + "...\n");
+
+        io_manager::tx(tx_type::power_off);
+        io_manager::tx(tx_type::power_on);
+        io_manager::tx(tx_type::start_fire);
+        io_manager::tx(tx_type::stop_fire);
+        io_manager::tx(tx_type::purge);
 
         if (tick > 3000) while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
     }

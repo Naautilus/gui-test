@@ -1,7 +1,7 @@
 #include <string>
 
 /*
-| io_manager is a class which writes and reads commands/data over the serial_interface.
+| io_manager is a struct which writes and reads commands/data over the serial_interface.
 | To be implemented are commands for:
       [WRITE]
 |   - powering on/off the test stand / rocket
@@ -23,12 +23,8 @@ enum tx_type {
     purge
 };
 
-class io_manager {
-    std::string rx_for_data;
-    std::string rx_for_error_code;
-    encode_base64();
-    decode_base64();
-    public:
-    tx(tx_type tx_type_);
-    rx();
+struct io_manager {
+    static void tx(tx_type tx_type_);
+    static void rx();
+    static std::string get_checksum(std::string base64_data);
 };

@@ -51,9 +51,22 @@ target_include_directories(asio PRIVATE
 
 target_link_libraries(asio PRIVATE ws2_32)
 
+########
+
+add_library(cppcodec
+    external/cppcodec/cppcodec/base64_default_rfc4648.hpp
+)
+
+set_target_properties(cppcodec PROPERTIES LINKER_LANGUAGE CXX)
+
+target_include_directories(cppcodec PRIVATE
+    external/cppcodec/cppcodec
+    external/cppcodec/cppcodec/detail
+)
+
 # Create the executable
 add_executable(main ${SRC_FILES})
-target_link_libraries(main PRIVATE imgui glfw3 opengl32 m implot asio)
+target_link_libraries(main PRIVATE imgui glfw3 opengl32 m implot asio cppcodec)
 
 # Include ImGui headers
 target_include_directories(main PRIVATE
@@ -61,4 +74,5 @@ target_include_directories(main PRIVATE
     external/imgui/backends
     external/implot
     external/asio/include
+    external/cppcodec/cppcodec
 )
