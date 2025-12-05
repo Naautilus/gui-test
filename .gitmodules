@@ -7,3 +7,9 @@
 [submodule "external/asio"]
 	path = external/asio
 	url = https://github.com/chriskohlhoff/asio
+[submodule "cppcodec"]
+	path = cppcodec
+	url = https://github.com/tplgy/cppcodec
+[submodule "external/cppcodec"]
+	path = external/cppcodec
+	url = https://github.com/tplgy/cppcodec
