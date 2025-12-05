@@ -24,7 +24,8 @@ enum tx_type {
 };
 
 struct io_manager {
-    static void tx(tx_type tx_type_);
-    static void rx();
+    static std::string get_tx_message(tx_type tx_type_);
+    static void rx(std::string rx_message);
     static std::string get_checksum(std::string base64_data);
+    static bool check_checksum(std::string base64_in, std::string checksum);
 };

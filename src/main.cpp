@@ -42,11 +42,13 @@ int main() {
 
         serial_interface_.write(std::to_string(tick) + "...\n");
 
-        io_manager::tx(tx_type::power_off);
-        io_manager::tx(tx_type::power_on);
-        io_manager::tx(tx_type::start_fire);
-        io_manager::tx(tx_type::stop_fire);
-        io_manager::tx(tx_type::purge);
+        //std::cout << io_manager::get_tx_message(tx_type::power_off) << "\n";
+        //std::cout << io_manager::get_tx_message(tx_type::power_on) << "\n";
+        //std::cout << io_manager::get_tx_message(tx_type::start_fire) << "\n";
+        //std::cout << io_manager::get_tx_message(tx_type::stop_fire) << "\n";
+        //std::cout << io_manager::get_tx_message(tx_type::purge) << "\n";
+
+        io_manager::rx("DATA\tAAAAAAAAAAAAAAAA\tAAAA");
 
         if (tick > 3000) while (std::chrono::high_resolution_clock::now() - time_start < time_interval);
     }
